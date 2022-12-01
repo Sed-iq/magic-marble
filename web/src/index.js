@@ -16,7 +16,7 @@ import Admin from './pages/admin/admin';
 import Player from './pages/player/player';
 import MagicMarble from './pages/games/magicmarble';
 
-const WEB_URL = 'http://localhost:3001';
+const WEB_URL = 'https://squid-app-mtjl8.ondigitalocean.app';
 
 // connecting to socket server (API)
 let socket = io(process.env.REACT_APP_API_URL, {

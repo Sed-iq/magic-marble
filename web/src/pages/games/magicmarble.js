@@ -514,7 +514,12 @@ export default function MagicMarble({ socket }) {
                         </div>
                     </div>
                     <div id='layer-bet' style={{ display: (playerOne.playerToPlay === playerOne.no && playerOne.score > 0 && playerTwo.score > 0) ? 'flex' : 'none' }}>
-                        <div className='text-center bg-[#1c2258] md:bg-[#0e1232] text-white text-2xl md:text-3xl px-2 py-1 rounded-xl' style={{ display: (betCounterText !== '' ? 'block' : 'none') }}>{betCounterText}</div>
+                        <div className={'text-center flex gap-2 align-middle bg-[#1c2258] md:bg-[#0e1232] text-white text-2xl md:text-3xl px-2 pt-2 pb-1 rounded-xl' + (betCounterText === '' ? ' hidden' : '')}>
+                            <img className='w-8 h-8' src='/images/pac-marble.png'></img>
+                            <span>
+                                {betCounterText}
+                            </span>
+                        </div>
                         <div className="wrapper">
                             <input id="bet-type" value={selectedChoice} type="checkbox" onClick={(e) => {
                                 setSelectedChoice(((selectedChoice === 'even') ? 'odd' : 'even'));

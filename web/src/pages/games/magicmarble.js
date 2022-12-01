@@ -5,11 +5,9 @@ import { GetUser } from '../../utils';
 
 import './magicmarble.css';
 
-export default function MagicMarble(props) {
+export default function MagicMarble({ socket }) {
     const [userId, setUserId] = useState('');
     const [tournamentId, setTournamentId] = useState('');
-
-    const [isStartedTournament, setIsStartedTournament] = useState(false);
     const [playerOne, setPlayerOne] = useState({
         playerId: '',
         no: 0,
@@ -38,10 +36,12 @@ export default function MagicMarble(props) {
     });
     const [selectedChoice, setSelectedChoice] = useState('even');
     const [selectedAmount, setSelectedAmount] = useState(1);
+    const [message, setMessage] = useState('');
     const [isOpenPopup, setIsOpenPopup] = useState(false);
     const [popupResult, setPopupResult] = useState(null);
     const [language, setLanguage] = useState('en');
     const [counterText, setCounterText] = useState('');
+    const [betCounterText, setBetCounterText] = useState('');
 
     const navigate = useNavigate();
 
@@ -149,6 +149,7 @@ export default function MagicMarble(props) {
     }
 
     function playRound(roundWinner) {
+        console.log("safsafsaf")
         if (playerOne.score === 0 || playerTwo.score === 0) {
             const result = '';
             if (roundWinner === playerOne.username) {
@@ -163,9 +164,6 @@ export default function MagicMarble(props) {
     }
 
     function updatePlayers(tournament) {
-        if (!isStartedTournament) {
-            setIsStartedTournament(true);
-        }
         tournament.currentPlayers.forEach((player) => {
             if (player.playerId === userId) {
                 setPlayerOne(player);
@@ -179,6 +177,7 @@ export default function MagicMarble(props) {
     }
 
     function update(tournament) {
+        console.log(tournament);
         updatePlayers(tournament);
         if (tournamentId && userId) {
             let idx = tournament.currentPlayers.findIndex((player) => player.playerId === userId);
@@ -218,14 +217,31 @@ export default function MagicMarble(props) {
                 return;
             }
 
-            setCounterText('');
-            props.socket.emit('addedbet', { tournamentId: tournamentId, player: playerOne });
+            setBetCounterText('');
+            setSelectedAmount(1);
+            setSelectedChoice('even');
+            socket.emit('addedbet', { tournamentId: tournamentId, player: playerOne });
+            playerOne.playerToPlay = 0;
+            playerTwo.playerToPlay = 0;
+            setPlayerOne(playerOne);
+        }
+    }
+
+    function sendMessage(e) {
+        if (message && playerOne.playerId) {
+            socket.emit('message', { tournamentId: tournamentId, playerId: playerOne.playerId, message: message });
+            setMessage('');
         }
     }
 
     useEffect(() => {
+        console.log(playerOne)
+        console.log(playerTwo)
+    }, [playerOne, playerTwo])
+
+    useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(props.socket);
+            const user = await GetUser(socket);
             if (!user || user.isAdmin) {
                 changeUrl('/login');
             }
@@ -247,11 +263,11 @@ export default function MagicMarble(props) {
         }
         setupFuns();
         asyncFunc();
-    }, []);
+    }, [socket]);
 
     useEffect(() => {
         if (tournamentId && userId) {
-            let socket = props.socket;
+
             socket.emit('valid', { tournamentId: tournamentId, userId: userId });
 
             socket.on('valid', (data) => {
@@ -261,8 +277,6 @@ export default function MagicMarble(props) {
                         changeUrl('/player/dashboard');
                     }
                     else {
-                        setIsStartedTournament(false);
-
                         socket.emit('update', { tournamentId: tournamentId, userId: userId });
 
                         socket.on("counter", (data) => {
@@ -277,20 +291,15 @@ export default function MagicMarble(props) {
                             }
                         });
 
-                        socket.on("startTournament", (data) => {
-                            if (window.location.pathname === "/games/magicmarble") {
-                                setIsStartedTournament(true);
-                            }
-                        });
-
                         socket.on("betCounter", (data) => {
                             if (window.location.pathname === "/games/magicmarble") {
                                 updatePlayers(data.tournament);
+                                console.log(data.tournament);
                                 data.tournament.currentPlayers.forEach((player) => {
                                     if (player.playerId === userId && playerOne.score > 0 && playerTwo.score > 0) {
                                         if (player.no === player.playerToPlay) {
                                             let time = (data.tournament.timePerMove - player.betTimeSeconds);
-                                            setCounterText((time > 9 ? "00:" + time : "00:0" + time));
+                                            setBetCounterText((time > 9 ? "00:" + time : "00:0" + time));
                                         }
                                     }
                                 })
@@ -299,7 +308,7 @@ export default function MagicMarble(props) {
 
                         socket.on("autoAddBet", (data) => {
                             if (window.location.pathname === "/games/magicmarble") {
-                                setCounterText("");
+                                setBetCounterText("");
                                 setSelectedAmount(1);
                             }
                         });
@@ -318,9 +327,7 @@ export default function MagicMarble(props) {
 
                         socket.on('playRound', (data) => {
                             if (window.location.pathname === "/games/magicmarble") {
-                                if (userId) {
-                                    playRound(data.roundWinner);
-                                }
+                                playRound(data.roundWinner);
                             }
                         });
 
@@ -338,11 +345,10 @@ export default function MagicMarble(props) {
                             }
                         });
 
-                        socket.on("message", (data) => {
+                        socket.on("alertMessage", (data) => {
                             if (window.location.pathname === "/games/magicmarble") {
-                                if (data.message) {
-                                    setIsOpenPopup(true);
-                                    setPopupResult(data.message);
+                                if (data.result) {
+                                    alert(data.result);
                                 }
                             }
                         });
@@ -352,13 +358,9 @@ export default function MagicMarble(props) {
         }
     }, [tournamentId, userId]);
 
-    useEffect(() => {
-        console.log("texxt" + counterText);
-    }, [counterText]);
-
     return (
         <div id="main-side">
-            <div id="counter" className={counterText !== '' ? '' : 'hidden'}>{counterText}</div>
+            <div className='absolute top-5 inset-x-0 text-center text-white text-2xl rouned p-2' style={{ display: (counterText !== '' ? 'block' : 'none') }}>{counterText}</div>
             <div id="main-top">
                 <div id="top-panel">
                     <a className="link" id="rules" onClick={showRules}>Game rules</a>
@@ -483,8 +485,13 @@ export default function MagicMarble(props) {
                 <div id="bot-left">
                     <div id="layer-p2">
                         <div className="info">
-                            <div className="name two">{playerTwo.username}</div>
-                            <div className="role two">{playerTwo.role}</div>
+                            <img className={'inline-block w-10 h-10 rounded-full' + ((playerTwo.playerId !== '') ? '' : ' hidden')}
+                                src="https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg"
+                                alt="Avatar of Jonathan Reinink" />
+                            <div>
+                                <div className="name two">{playerTwo.username}</div>
+                                <div className="role two">{playerTwo.role}</div>
+                            </div>
                         </div>
                         <div className="score two">{playerTwo.score}</div>
                         <div className="marbles two">
@@ -493,15 +500,21 @@ export default function MagicMarble(props) {
                     </div>
                     <div id="layer-p1">
                         <div className="info">
-                            <div className="name one">{playerOne.username}</div>
-                            <div className="role one">{playerOne.role}</div>
+                            <img className={'inline-block w-10 h-10 rounded-full' + ((playerOne.playerId !== '') ? '' : ' hidden')}
+                                src="https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg"
+                                alt="Avatar of Jonathan Reinink" />
+                            <div>
+                                <div className="name one">{playerOne.username}</div>
+                                <div className="role one">{playerOne.role}</div>
+                            </div>
                         </div>
                         <div className="score one">{playerOne.score}</div>
                         <div className="marbles one">
                             {renderMarbles(playerOne.score)}
                         </div>
                     </div>
-                    <div id='layer-bet' style={{ display: (playerOne.playerToPlay === playerOne.no) ? 'flex' : 'none' }}>
+                    <div id='layer-bet' style={{ display: (playerOne.playerToPlay === playerOne.no && playerOne.score > 0 && playerTwo.score > 0) ? 'flex' : 'none' }}>
+                        <div className='text-center bg-[#1c2258] md:bg-[#0e1232] text-white text-2xl md:text-3xl px-2 py-1 rounded-xl' style={{ display: (betCounterText !== '' ? 'block' : 'none') }}>{betCounterText}</div>
                         <div className="wrapper">
                             <input id="bet-type" value={selectedChoice} type="checkbox" onClick={(e) => {
                                 setSelectedChoice(((selectedChoice === 'even') ? 'odd' : 'even'));
@@ -562,7 +575,7 @@ export default function MagicMarble(props) {
                             </div>
                             <div id="tournament-stats">
                                 <div className="tournament-stats">
-                                    <div id="current-round">{playerOne.round}</div>
+                                    <div id="current-round">{playerOne.totalRounds}</div>
                                     <div>Current round</div>
                                 </div>
                                 <div className="tournament-stats">
@@ -616,19 +629,27 @@ export default function MagicMarble(props) {
                                 <p key={index} className="">
                                     {log.type === "info" ? (
                                         <span className="text-gray-500">{log.message}</span>
-                                    ) : (
+                                    ) : log.type === "round" ? (
                                         <span className="text-red-500">{log.message}</span>
-                                    )}
+                                    ) : (
+                                        <span className="text-white">{log.message}</span>
+                                    )
+                                    }
                                 </p>
                             ))}
                         </div>
-                        <div className="chat-prompt">
+                        <div className='chat-prompt' style={{ display: (playerOne.playerId !== '' ? 'flex' : 'none') }}>
                             <div>
                                 <input
                                     id="message"
                                     type="text"
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
                                     placeholder="Tap to send a message"
                                 />
+                                <button onClick={sendMessage} className="bg-green-400 text-white text-sm my-auto p-2 m-0 rounded-md">
+                                    Send
+                                </button>
                             </div>
                         </div>
                     </div>

@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser, PlayerGetAllTournaments, JoinTournament } from '../../../utils';
 
-export default function All(props) {
+export default function All({socket, username, isAdmin, changeUrl}) {
     const [upcomingTournaments, setUpcomingTournaments] = useState([]);
     const [liveTournaments, setLiveTournaments] = useState([]);
 
     async function joinTournament(tournamentId) {
-        const result = await JoinTournament(props.socket, tournamentId);
+        const result = await JoinTournament(socket, tournamentId);
         if (result !== null) {
             if (result) {
                 loadTournaments('upcoming');
@@ -15,7 +15,7 @@ export default function All(props) {
             }
         }
         else {
-            props.changeUrl('/login');
+            changeUrl('/login');
         }
     }
 
@@ -59,7 +59,7 @@ export default function All(props) {
                         {dateToAgo(new Date(tournament.startDateTime))}
                     </p>
                     <div className="grid grid-cols-2 gap-2">
-                        <button onClick={(e) => props.changeUrl('/player/tournaments/view?id=' + tournament.id)}
+                        <button onClick={(e) => changeUrl('/player/tournaments/view?id=' + tournament.id)}
                             className="px-6 py-2 w-fit mt-4 text-sm font-medium leading-5 text-green-500 dark:text-green-600 transition-colors duration-150 bg-green-100 dark:bg-transparent border border-transparent dark:border-green-600 rounded-lg active:bg-green-600 hover:bg-green-700 hover:text-white dark:hover:bg-green-700 dark:hover:text-white focus:outline-none focus:shadow-outline-green">
                             View
                         </button>
@@ -74,7 +74,7 @@ export default function All(props) {
     }
 
     async function loadTournaments(status) {
-        const result = await PlayerGetAllTournaments(props.socket, status, 'getTournamentsForPlayer')
+        const result = await PlayerGetAllTournaments(socket, status, 'getTournamentsForPlayer')
         if (result) {
             if (status === 'upcoming') {
                 setUpcomingTournaments(result);
@@ -87,9 +87,9 @@ export default function All(props) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(props.socket);
+            const user = await GetUser(socket);
             if (!user || user.isAdmin) {
-                props.changeUrl('/login');
+                changeUrl('/login');
             }
             else {
                 loadTournaments('upcoming');
@@ -97,7 +97,7 @@ export default function All(props) {
             }
         }
         asyncFunc();
-    },[]);
+    },[socket]);
 
     return (
         <main className="h-full overflow-y-auto">

@@ -2,23 +2,23 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser, AdminGetAllTournaments, DeleteTournament } from '../../../utils';
 
-export default function Live(props) {
+export default function Live({socket, username, isAdmin, changeUrl}) {
     const [tournaments, setTournaments] = useState([]);
 
     async function deleteTournament(tournamentId) {
-        const result = await DeleteTournament(props.socket, tournamentId);
+        const result = await DeleteTournament(socket, tournamentId);
         if (result !== null) {
             if (result === true) {
                 loadTournaments();
             }
         }
         else {
-            props.changeUrl('/login')
+            changeUrl('/login')
         }
     }
 
     async function loadTournaments() {
-        const result = await AdminGetAllTournaments(props.socket, 'live')
+        const result = await AdminGetAllTournaments(socket, 'live')
         if (result) {
             setTournaments(result);
         }
@@ -26,16 +26,16 @@ export default function Live(props) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(props.socket);
+            const user = await GetUser(socket);
             if (!user || !user.isAdmin) {
-                props.changeUrl('/login');
+                changeUrl('/login');
             }
             else {
                 loadTournaments();
             }
         }
         asyncFunc();
-    },[]);
+    },[socket]);
 
     return (
         <main className="h-full overflow-y-auto">
@@ -86,7 +86,7 @@ export default function Live(props) {
                                         </td>
                                         <td className="px-4 py-3 text-sm">
                                             <div className="flex items-center space-x-4 text-sm">
-                                                <button onClick={(e) => props.changeUrl('/admin/tournaments/view?tournamentId=' + tournament.id)}
+                                                <button onClick={(e) => changeUrl('/admin/tournaments/view?tournamentId=' + tournament.id)}
                                                     className="px-2 py-1 font-semibold leading-tight text-yellow-700 bg-yellow-100 rounded dark:bg-yellow-700 dark:text-yellow-100">
                                                     View
                                                 </button>

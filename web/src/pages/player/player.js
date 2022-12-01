@@ -16,7 +16,7 @@ import View from '../../components/tournaments/view';
 
 import { GetUser } from '../../utils';
 
-export default function Player(props) {
+export default function Player({socket}) {
     const [sideBarOpen, setSideBarOpen] = useState(true);
     const [openendPage, setOpenedPage] = useState('Dashboard');
     const [username, setUsername] = useState('Admin');
@@ -54,7 +54,7 @@ export default function Player(props) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(props.socket);
+            const user = await GetUser(socket);
             if (!user) {
                 changeUrl('/login');
             }
@@ -64,23 +64,23 @@ export default function Player(props) {
             }
         }
         asyncFunc();
-    },[]);
+    },[socket]);
 
 
     return (
         <div className="flex h-screen bg-gray-900">
-            <Sidebar socket={props.socket} username={username} isAdmin={false} sideBarOpen={sideBarOpen} openendPage={openendPage} changeUrl={changeUrl} />
+            <Sidebar socket={socket} username={username} isAdmin={false} sideBarOpen={sideBarOpen} openendPage={openendPage} changeUrl={changeUrl} />
             <div className="flex flex-col flex-1 w-full">
-                <Navbar socket={props.socket} username={username} isAdmin={false} sideBarOpen={sideBarOpen} toggleSideBar={toggleSideBar} changeUrl={changeUrl} />
+                <Navbar socket={socket} username={username} isAdmin={false} sideBarOpen={sideBarOpen} toggleSideBar={toggleSideBar} changeUrl={changeUrl} />
                 <Routes>
-                    <Route path="/dashboard" element={<Dashboard socket={props.socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
-                    <Route path="/profile" element={<Profile socket={props.socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
-                    <Route path="/setting" element={<Setting socket={props.socket} username={username} isAdmin={false} setUsername={setUsername} changeUrl={changeUrl} />} />
-                    <Route path="/tournaments/all" element={<All socket={props.socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
-                    <Route path="/tournaments/joined" element={<Joined socket={props.socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
-                    <Route path="/tournaments/live" element={<Live socket={props.socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
-                    <Route path="/tournaments/played" element={<Played socket={props.socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
-                    <Route path="/tournaments/view" element={<View socket={props.socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
+                    <Route path="/dashboard" element={<Dashboard socket={socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
+                    <Route path="/profile" element={<Profile socket={socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
+                    <Route path="/setting" element={<Setting socket={socket} username={username} isAdmin={false} setUsername={setUsername} changeUrl={changeUrl} />} />
+                    <Route path="/tournaments/all" element={<All socket={socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
+                    <Route path="/tournaments/joined" element={<Joined socket={socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
+                    <Route path="/tournaments/live" element={<Live socket={socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
+                    <Route path="/tournaments/played" element={<Played socket={socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
+                    <Route path="/tournaments/view" element={<View socket={socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
                     <Route path="*" element={<Navigate to={'/player/dashboard'} />} />
                 </Routes>
             </div>

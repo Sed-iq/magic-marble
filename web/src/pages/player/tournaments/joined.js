@@ -2,23 +2,23 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser, PlayerGetAllTournaments, LeaveTournament } from '../../../utils';
 
-export default function Joined(props) {
+export default function Joined(socket, username, isAdmin, changeUrl) {
     const [tournaments, setTournaments] = useState([]);
 
     async function leaveTournament(tournamentId) {
-        const result = await LeaveTournament(props.socket, tournamentId);
+        const result = await LeaveTournament(socket, tournamentId);
         if (result !== null) {
             if (result) {
                 loadTournaments();
             }
         }
         else {
-            props.changeUrl('/login');
+            changeUrl('/login');
         }
     }
 
     async function loadTournaments() {
-        const result = await PlayerGetAllTournaments(props.socket, 'upcoming', 'getPlayerTournaments')
+        const result = await PlayerGetAllTournaments(socket, 'upcoming', 'getPlayerTournaments')
         if (result) {
             setTournaments(result);
         }
@@ -26,16 +26,16 @@ export default function Joined(props) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(props.socket);
+            const user = await GetUser(socket);
             if (!user || user.isAdmin) {
-                props.changeUrl('/login');
+                changeUrl('/login');
             }
             else {
                 loadTournaments();
             }
         }
         asyncFunc();
-    },[]);
+    },[socket]);
 
     return (
         <main className="h-full overflow-y-auto">
@@ -49,7 +49,7 @@ export default function Joined(props) {
                         <span>You can leave any tournament</span>
                     </div>
                 </div>
-                <div className="px-4 py-4 bg-white rounded-lg overflow-auto shadow-md dark:bg-gray-800">
+                <div className="px-4 py-4 mb-8 bg-white rounded-lg overflow-auto shadow-md dark:bg-gray-800">
                     <div className="w-full overflow-x-auto">
                         <h4 className="mb-4 font-semibold text-gray-600 dark:text-gray-300">
                             These all are tournaments that you joined.
@@ -94,7 +94,7 @@ export default function Joined(props) {
                                         </td>
                                         <td className="px-4 py-3 text-sm">
                                             <div className="flex items-center space-x-4 text-sm">
-                                                <button onClick={(e) => props.changeUrl('/player/tournaments/view?id=' + tournament.id)}
+                                                <button onClick={(e) => changeUrl('/player/tournaments/view?id=' + tournament.id)}
                                                     className="px-2 py-1 font-semibold leading-tight rounded bg-yellow-700 text-yellow-100">
                                                     View
                                                 </button>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 
 import Navbar from '../../components/navbar';
 import Sidebar from '../../components/admin/sidebar';
@@ -18,7 +18,7 @@ import View from '../../components/tournaments/view';
 
 import { GetUser } from '../../utils';
 
-export default function Player(props) {
+export default function Player({ socket }) {
     const [sideBarOpen, setSideBarOpen] = useState(true);
     const [openendPage, setOpenedPage] = useState('Dashboard');
     const [username, setUsername] = useState('Player');
@@ -72,7 +72,7 @@ export default function Player(props) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(props.socket);
+            const user = await GetUser(socket);
             if (!user) {
                 changeUrl('/login');
             }
@@ -82,26 +82,26 @@ export default function Player(props) {
             }
         }
         asyncFunc();
-    },[]);
+    }, [socket]);
 
 
     return (
         <div className="flex h-screen bg-gray-900">
-            <Sidebar socket={props.socket} username={username} isAdmin={true} sideBarOpen={sideBarOpen} openendPage={openendPage} changeUrl={changeUrl} />
+            <Sidebar socket={socket} username={username} isAdmin={true} sideBarOpen={sideBarOpen} openendPage={openendPage} changeUrl={changeUrl} />
             <div className="flex flex-col flex-1 w-full">
-                <Navbar socket={props.socket} username={username} isAdmin={true} sideBarOpen={sideBarOpen} toggleSideBar={toggleSideBar} changeUrl={changeUrl} />
+                <Navbar socket={socket} username={username} isAdmin={true} sideBarOpen={sideBarOpen} toggleSideBar={toggleSideBar} changeUrl={changeUrl} />
                 <Routes>
-                    <Route path="/dashboard" element={<Dashboard socket={props.socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
-                    <Route path="/players" element={<Players socket={props.socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
-                    <Route path="/profile" element={<Profile socket={props.socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
-                    <Route path="/setting" element={<Setting socket={props.socket} username={username} isAdmin={true} setUsername={setUsername} changeUrl={changeUrl} />} />
-                    <Route path="/tournaments/create" element={<Create socket={props.socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
-                    <Route path="/tournaments/deleted" element={<Deleted socket={props.socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
-                    <Route path="/tournaments/edit" element={<Edit socket={props.socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
-                    <Route path="/tournaments/completed" element={<Completed socket={props.socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
-                    <Route path="/tournaments/live" element={<Live socket={props.socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
-                    <Route path="/tournaments/upcoming" element={<Upcoming socket={props.socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
-                    <Route path="/tournaments/view" element={<View socket={props.socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
+                    <Route path="/dashboard" element={<Dashboard socket={socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
+                    <Route path="/players" element={<Players socket={socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
+                    <Route path="/profile" element={<Profile socket={socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
+                    <Route path="/setting" element={<Setting socket={socket} username={username} isAdmin={true} setUsername={setUsername} changeUrl={changeUrl} />} />
+                    <Route path="/tournaments/create" element={<Create socket={socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
+                    <Route path="/tournaments/deleted" element={<Deleted socket={socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
+                    <Route path="/tournaments/edit" element={<Edit socket={socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
+                    <Route path="/tournaments/completed" element={<Completed socket={socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
+                    <Route path="/tournaments/live" element={<Live socket={socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
+                    <Route path="/tournaments/upcoming" element={<Upcoming socket={socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
+                    <Route path="/tournaments/view" element={<View socket={socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
                     <Route path="*" element={<Navigate to={'/admin/dashboard'} />} />
                 </Routes>
             </div>

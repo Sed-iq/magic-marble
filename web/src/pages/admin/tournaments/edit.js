@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser, GetATournament, UpdateTournament } from '../../../utils';
 
-export default function View(props) {
+export default function View({socket, username, isAdmin, changeUrl}) {
     const [tournamentId, setTournamentId] = useState(null);
     const [name, setName] = useState('');
     const [rules, setRules] = useState("Guesser determines the wager amount");
@@ -54,19 +54,19 @@ export default function View(props) {
 
     async function updateTournament(e) {
         e.preventDefault();
-        const result = await UpdateTournament(props.socket, tournamentId, name, description, rules, tournamentType, prizeAndDistribution, timePerMove, timeBetweenRounds, maxParticipants, dateTime, optionalLink);
+        const result = await UpdateTournament(socket, tournamentId, name, description, rules, tournamentType, prizeAndDistribution, timePerMove, timeBetweenRounds, maxParticipants, dateTime, optionalLink);
         if (result !== null) {
             if (result === true) {
-                props.changeUrl('/admin/tournaments/upcoming');
+                changeUrl('/admin/tournaments/upcoming');
             }
         }
         else {
-            props.changeUrl('/login');
+            changeUrl('/login');
         }
     }
 
     async function loadTournament(tournamentId) {
-        const result = await GetATournament(props.socket, tournamentId);
+        const result = await GetATournament(socket, tournamentId);
         if (result) {
             const tournament = result;
             setName(tournament.name.toString());
@@ -107,9 +107,9 @@ export default function View(props) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(props.socket);
+            const user = await GetUser(socket);
             if (!user || !user.isAdmin) {
-                props.changeUrl('/login');
+                changeUrl('/login');
             }
             else {
                 if (window.location.href.split('?')[1]) {
@@ -119,26 +119,26 @@ export default function View(props) {
                         loadTournament(tournamentId);
                     }
                     else {
-                        if (props.isAdmin) {
-                            props.changeUrl('/admin/dashboard');
+                        if (isAdmin) {
+                            changeUrl('/admin/dashboard');
                         }
                         else {
-                            props.changeUrl('/player/dashboard');
+                            changeUrl('/player/dashboard');
                         }
                     }
                 }
                 else {
-                    if (props.isAdmin) {
-                        props.changeUrl('/admin/dashboard');
+                    if (isAdmin) {
+                        changeUrl('/admin/dashboard');
                     }
                     else {
-                        props.changeUrl('/player/dashboard');
+                        changeUrl('/player/dashboard');
                     }
                 }
             }
         }
         asyncFunc();
-    },[]);
+    },[socket]);
 
     return (
         <main className="h-full overflow-y-auto">

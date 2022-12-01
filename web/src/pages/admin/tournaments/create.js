@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser, CreateTournament } from '../../../utils';
 
-export default function Create(props) {
+export default function Create({socket, username, isAdmin, changeUrl}) {
     const [name, setName] = useState('');
     const [rules, setRules] = useState("Guesser determines the wager amount");
     const [tournamentType, setTournamentType] = useState("Single Elimination");
@@ -53,7 +53,7 @@ export default function Create(props) {
 
     async function createTournament(e) {
         e.preventDefault();
-        const result = await CreateTournament(props.socket, name, description, rules, tournamentType, prizeAndDistribution, timePerMove, timeBetweenRounds, maxParticipants, optionalLink, dateTime);
+        const result = await CreateTournament(socket, name, description, rules, tournamentType, prizeAndDistribution, timePerMove, timeBetweenRounds, maxParticipants, optionalLink, dateTime);
         if (result !== null) {
             if (result === true) {
                 setName('');
@@ -69,19 +69,19 @@ export default function Create(props) {
             }
         }
         else {
-            props.changeUrl('/login');
+            changeUrl('/login');
         }
     }
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(props.socket);
+            const user = await GetUser(socket);
             if (!user || !user.isAdmin) {
-                props.changeUrl('/login');
+                changeUrl('/login');
             }
         }
         asyncFunc();
-    },[]);
+    },[socket]);
 
     return (
         <main className="h-full overflow-y-auto">

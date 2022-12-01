@@ -426,7 +426,7 @@ body {
 
 .info {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 0.5rem;
 }
 
@@ -493,7 +493,7 @@ body {
 
   .info {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.5rem;
     margin: auto 0;
   }
@@ -684,7 +684,7 @@ body {
     background-color: #1c2258;
     margin-top: -3rem;
     margin-left: -1.5rem;
-    margin-bottom: -1.5rem;
+    margin-bottom: 1.5rem;
     min-width: 20rem;
     width: 100%;
     padding: 1.5rem;
@@ -951,7 +951,6 @@ body {
   width: 100%;
   border-radius: 0.5rem;
   top: 13rem;
-  background-color: #1c2258;
   margin-bottom: 4rem;
 }
 
@@ -964,8 +963,14 @@ body {
   background: none;
   border: none;
   color: #5762c5;
+  background-color: #1c2258;
   width: 100%;
   margin: 0.5rem 0.5rem;
+  margin-left: 0px;
+  width: 100%;
+  border-radius: 0.5rem;
+  height: 2.5rem;
+  padding: 4px;
 }
 
 .chat-prompt.visible>div>input:focus {
@@ -1001,7 +1006,6 @@ body {
     height: 100%;
     background-color: #1c2258;
     margin-bottom: 1rem;
-    padding: 4px;
   }
 
   .chat-prompt {
@@ -1009,9 +1013,6 @@ body {
     position: relative;
     width: 100%;
     margin-top: auto;
-    background-color: #1c2258;
-    border-radius: 0.5rem;
-    height: 4rem;
     margin-bottom: 0.85rem;
   }
 
@@ -1021,11 +1022,15 @@ body {
   }
 
   .chat-prompt>div>input {
-    background: none;
     border: none;
     color: #5762c5;
+    background-color: #1c2258;
     width: 100%;
+    border-radius: 0.5rem;
+    height: 2.5rem;
     margin: 0.5rem 0.5rem;
+    margin-left: 0px;
+    padding: 4px;
   }
 
   .chat-prompt>div>input:focus {

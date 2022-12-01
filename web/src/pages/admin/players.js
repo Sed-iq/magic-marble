@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser } from '../../utils';
 
-export default function Players(props) {
+export default function Players({socket, username, isAdmin, changeUrl}) {
     const [players, setPlayers] = useState([]);
 
     async function loadPlayers(userId) {
@@ -20,16 +20,16 @@ export default function Players(props) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(props.socket);
+            const user = await GetUser(socket);
             if (!user || !user.isAdmin) {
-                props.changeUrl('/login');
+                changeUrl('/login');
             }
             else {
                 loadPlayers(user.id);
             }
         }
         asyncFunc();
-    },[]);
+    },[socket]);
 
     return (
         <main className="h-full overflow-y-auto">

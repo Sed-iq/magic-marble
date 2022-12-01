@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser } from '../../utils';
 
-export default function Dashboard(props) {
+export default function Dashboard({socket, username, isAdmin, changeUrl}) {
     const [totalPlayers, setTotalPlayers] = useState(0);
     const [upcomingTournaments, setUpcomingTournaments] = useState(0);
     const [liveTournaments, setLiveTournaments] = useState(0);
@@ -27,16 +27,16 @@ export default function Dashboard(props) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(props.socket);
+            const user = await GetUser(socket);
             if (!user || !user.isAdmin) {
-                props.changeUrl('/login');
+                changeUrl('/login');
             }
             else {
                 loadData(user.id);
             }
         }
         asyncFunc();
-    },[]);
+    },[socket]);
 
     return (
         <main className="h-full overflow-y-auto">
@@ -45,12 +45,12 @@ export default function Dashboard(props) {
                     Dashboard
                 </h2>
                 <a className="cusor-pointer flex items-center justify-between p-4 mb-8 text-sm font-semibold text-purple-100 bg-purple-600 rounded-lg shadow-md focus:outline-none focus:shadow-outline-purple"
-                    onClick={(e) => props.changeUrl('/admin/tournaments/live')}>
+                    onClick={(e) => changeUrl('/admin/tournaments/live')}>
                     <div className="flex items-center">
                         <i className="fa-solid fa-globe mr-3"></i>
                         <span>Some Tournaments are Live Now</span>
                     </div>
-                    <span className='cursor-pointer' onClick={(e) => props.changeUrl('/admin/tournaments/live')}>
+                    <span className='cursor-pointer' onClick={(e) => changeUrl('/admin/tournaments/live')}>
                         See more
                         <i className="fas fa-arrow-right ml-2 align-middle"></i>
                     </span>

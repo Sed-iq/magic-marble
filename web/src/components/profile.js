@@ -34,7 +34,7 @@ export default function Profile(props) {
                         <span className="text-gray-400">Password</span>
                         <input
                             className="block w-full mt-1 px-2 py-2 rounded text-sm border-gray-600 bg-gray-700 focus:border-purple-400 focus:outline-none text-gray-300 focus:shadow-outline-gray form-input"
-                            value="•••••••••" type="password" disabled />
+                            value="•••••••••" disabled />
                     </label>
 
                     <div className="mt-4 text-sm">

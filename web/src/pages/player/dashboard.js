@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser } from '../../utils';
 
-export default function Dashboard(props) {
+export default function Dashboard({ socket, username, isAdmin, changeUrl }) {
     const [playedTournaments, setPlayedTournaments] = useState(0);
     const [wonTournaments, setWonTournaments] = useState(0);
     const [joinedTournaments, setJoinedTournaments] = useState(0);
@@ -26,16 +26,16 @@ export default function Dashboard(props) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(props.socket);
+            const user = await GetUser(socket);
             if (!user || user.isAdmin) {
-                props.changeUrl('/login');
+                changeUrl('/login');
             }
             else {
                 loadData(user.id);
             }
         }
         asyncFunc();
-    },[]);
+    }, [socket]);
 
     return (
         <main className="h-full overflow-y-auto">

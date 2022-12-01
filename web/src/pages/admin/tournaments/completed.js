@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser, AdminGetAllTournaments } from '../../../utils';
 
-export default function Completed(props) {
+export default function Completed({socket, username, isAdmin, changeUrl}) {
     const [tournaments, setTournaments] = useState([]);
 
     async function loadTournaments() {
-        const result = await AdminGetAllTournaments(props.socket, 'completed')
+        const result = await AdminGetAllTournaments(socket, 'completed')
         if (result) {
             setTournaments(result);
         }
@@ -14,17 +14,16 @@ export default function Completed(props) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(props.socket);
+            const user = await GetUser(socket);
             if (!user || !user.isAdmin) {
-                props.changeUrl('/login');
+                changeUrl('/login');
             }
             else {
                 loadTournaments();
             }
         }
         asyncFunc();
-        console.log("hi")
-    },[]);
+    },[socket]);
 
     return (
         <main className="h-full overflow-y-auto">

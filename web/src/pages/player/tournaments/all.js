@@ -13,8 +13,7 @@ export default function All({ socket, username, isAdmin, changeUrl }) {
         const result = await JoinTournament(socket, tournamentId);
         if (result !== null) {
             if (result) {
-                loadTournaments('upcoming');
-                loadTournaments('live');
+                changeUrl(`/player/tournaments/joined`);
             }
         }
         else {

@@ -349,10 +349,6 @@ const addBet = async (data) => {
                     currentTournaments[index].currentPlayers[matchWithPlayerIdx] = playerTwo;
 
                     // updating player records
-                    messageToAllSockets(data.tournamentId, "updatePlayers", { tournament: currentTournaments[index] });
-                    // Playing Round
-                    messageToBothPlayers(data.tournamentId, playerOne.playerId, "playRound", { roundWinner: roundWinner });
-                    // updating player records
                     messageToAllSockets(data.tournamentId, "update", { tournament: currentTournaments[index] });
 
                     if (playerOne.score > 0 && playerTwo.score > 0) {
@@ -433,7 +429,7 @@ const addMessage = async (data) => {
                 currentTournaments[index].currentPlayers[matchWithPlayerIdx] = playerTwo;
 
                 // updating player records
-                messageToAllSockets(data.tournamentId, "updatePlayers", { tournament: currentTournaments[index] });
+                messageToAllSockets(data.tournamentId, "update", { tournament: currentTournaments[index] });
             }
         }
     }
@@ -454,7 +450,7 @@ const CheckTournamentStatus = (tournamentId) => {
                             await updatePlayerRecord(player.playerId, player);
                             // remove player from current players
                             currentTournaments[index].currentPlayers = currentTournaments[index].currentPlayers.filter((p) => p.playerId !== player.playerId);
-                            messageToAPlayer(tournamentId, player.playerId, "endTournament", { tournament: currentTournaments[index] });
+                            messageToAPlayer(tournamentId, player.playerId, "endTournament", { tournamentId: currentTournaments[index].id });
                         }
                     }
                 });

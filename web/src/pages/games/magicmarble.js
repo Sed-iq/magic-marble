@@ -42,7 +42,7 @@ export default function MagicMarble({ socket }) {
     const [popupResult, setPopupResult] = useState(null);
     const [language, setLanguage] = useState('en');
     const [counterText, setCounterText] = useState('');
-    const [betCounterText, setBetCounterText] = useState('00:00');
+    const [betCounterText, setBetCounterText] = useState('');
 
     const navigate = useNavigate();
 
@@ -114,7 +114,6 @@ export default function MagicMarble({ socket }) {
 
     function setupFuns() {
         const layerChat = document.getElementById('layer-chat');
-        const chatPrompt = document.querySelector('.chat-prompt');
         const swipeInfo = document.querySelector('.swipe-info');
         const swipeImg = document.querySelector('.swipe-img');
         const chatInfo = document.querySelector('.chat-info');
@@ -125,14 +124,12 @@ export default function MagicMarble({ socket }) {
         function checkDirection() {
             if (touchEndY < touchStartY) {
                 layerChat.classList.add('up');
-                chatPrompt.classList.add('visible');
                 swipeInfo.classList.add('none');
                 swipeImg.classList.add('rotate');
                 chatInfo.style.display = 'block';
             }
             if (touchEndY > touchStartY) {
                 layerChat.classList.remove('up');
-                chatPrompt.classList.remove('visible');
                 swipeInfo.classList.remove('none');
                 swipeImg.classList.remove('rotate');
                 chatInfo.style.display = 'none';
@@ -149,20 +146,6 @@ export default function MagicMarble({ socket }) {
         })
     }
 
-    function playRound(roundWinner) {
-        console.log("safsafsaf")
-        if (playerOne.score === 0 || playerTwo.score === 0) {
-            const result = '';
-            if (roundWinner === playerOne.username) {
-                result = (language === 'EN') ? 'You won!🥳' : 'Ты победили!🥳';
-            }
-            else if (roundWinner === playerTwo.username) {
-                result = (language === 'EN') ? 'You lost🙁' : 'Ты проиграла🙁';
-            }
-            setIsOpenPopup(true);
-            setPopupResult(result);
-        }
-    }
 
     function updatePlayers(tournament) {
         tournament.currentPlayers.forEach((player) => {
@@ -178,7 +161,6 @@ export default function MagicMarble({ socket }) {
     }
 
     function update(tournament) {
-        console.log(tournament);
         updatePlayers(tournament);
         if (tournamentId && userId) {
             let idx = tournament.currentPlayers.findIndex((player) => player.playerId === userId);
@@ -218,7 +200,10 @@ export default function MagicMarble({ socket }) {
                 return;
             }
 
+            console.log('playerOne', playerOne);
+
             socket.emit('addedbet', { tournamentId: tournamentId, player: playerOne });
+
             setBetCounterText('00:00');
             setSelectedChoice('even');
             setSelectedAmount(1);
@@ -234,11 +219,6 @@ export default function MagicMarble({ socket }) {
             setMessage('');
         }
     }
-
-    useEffect(() => {
-        console.log(playerOne)
-        console.log(playerTwo)
-    }, [playerOne, playerTwo])
 
     useEffect(() => {
         const asyncFunc = async () => {
@@ -268,7 +248,6 @@ export default function MagicMarble({ socket }) {
 
     useEffect(() => {
         if (tournamentId && userId) {
-
             socket.emit('valid', { tournamentId: tournamentId, userId: userId });
 
             socket.on('valid', (data) => {
@@ -294,55 +273,53 @@ export default function MagicMarble({ socket }) {
 
                         socket.on("betCounter", (data) => {
                             if (window.location.pathname === "/games/magicmarble") {
-                                updatePlayers(data.tournament);
-                                console.log(data.tournament);
-                                data.tournament.currentPlayers.forEach((player) => {
-                                    if (player.playerId === userId && playerOne.score > 0 && playerTwo.score > 0) {
-                                        if (player.no === player.playerToPlay) {
-                                            let time = (data.tournament.timePerMove - player.betTimeSeconds);
-                                            setBetCounterText((time > 9 ? "00:" + time : "00:0" + time));
+                                if (data.tournament.id === tournamentId) {
+                                    updatePlayers(data.tournament);
+                                    data.tournament.currentPlayers.forEach((player) => {
+                                        if (player.playerId === userId && playerOne.score > 0 && playerTwo.score > 0) {
+                                            if (player.no === player.playerToPlay) {
+                                                let time = (data.tournament.timePerMove - player.betTimeSeconds);
+                                                setBetCounterText((time > 9 ? "00:" + time : "00:0" + time));
+                                                console.log('betCounterText', betCounterText);
+                                            }
                                         }
-                                    }
-                                })
+                                    });
+                                }
                             }
                         });
 
                         socket.on("autoAddBet", (data) => {
                             if (window.location.pathname === "/games/magicmarble") {
-                                setBetCounterText("00:00");
-                                setSelectedAmount(1);
-                            }
-                        });
-
-                        socket.on("updatePlayers", (data) => {
-                            if (window.location.pathname === "/games/magicmarble") {
-                                updatePlayers(data.tournament);
+                                if (data.tournament.id === tournamentId) {
+                                    setBetCounterText("00:00");
+                                    setSelectedAmount(1);
+                                }
                             }
                         });
 
                         socket.on("update", (data) => {
                             if (window.location.pathname === "/games/magicmarble") {
-                                update(data.tournament);
-                            }
-                        });
-
-                        socket.on('playRound', (data) => {
-                            if (window.location.pathname === "/games/magicmarble") {
-                                playRound(data.roundWinner);
+                                if (data.tournament.id === tournamentId) {
+                                    update(data.tournament);
+                                }
                             }
                         });
 
                         socket.on('endTournament', (data) => {
                             if (window.location.pathname === "/games/magicmarble") {
-                                alert('Tournament ended!');
-                                changeUrl('/player/dashboard');
+                                if (data.tournamentId === tournamentId) {
+                                    alert('Tournament ended!');
+                                    changeUrl('/player/dashboard');
+                                }
                             }
                         });
 
                         socket.on("deleteTournament", (data) => {
                             if (window.location.pathname === "/games/magicmarble") {
-                                alert('Tournament deleted!');
-                                changeUrl('/player/dashboard');
+                                if (data.tournamentId === tournamentId) {
+                                    alert('Tournament deleted!');
+                                    changeUrl('/player/dashboard');
+                                }
                             }
                         });
 
@@ -359,12 +336,29 @@ export default function MagicMarble({ socket }) {
         }
     }, [tournamentId, userId]);
 
+
+    useEffect(() => {
+        if (playerOne.score === 0 || playerTwo.score === 0) {
+            let result = '';
+            if (playerTwo.score === 0) {
+                result = (language === 'en') ? 'You won!🥳' : 'Ты победили!🥳';
+            }
+            else if (playerOne.score === 0) {
+                result = (language === 'en') ? 'You lost🙁' : 'Ты проиграла🙁';
+            }
+            setIsOpenPopup(true);
+            setPopupResult(result);
+        }
+    }, [playerOne, playerTwo]);
+
     return (
-        <div id="main-side">
-            <div className='absolute top-5 inset-x-0 text-center text-white text-2xl rouned p-2' style={{ display: (counterText !== '' ? 'block' : 'none') }}>{counterText}</div>
-            <div id="main-top">
-                <div id="top-panel">
-                    <a className="link" id="rules" onClick={showRules}>Game rules</a>
+        <div className='relative flex flex-col w-screen md:w-[90%] my-0 mx-auto'>
+            {counterText &&
+                <div className='absolute top-5 inset-x-0 text-center text-white text-2xl rouned p-2'>{counterText}</div>
+            }
+            <div className='relative flex flex-col gap-2 mb-6'>
+                <div className='w-full relative text-[#d9d9d9] flex align-middle justify-between md:justify-end px-2 py-4 top-2'>
+                    <a className="transition my-auto cursor-pointer font-bold" id="rules" onClick={showRules}>Game rules</a>
                     <div id="rulesEN" className="overlay">
                         <div className="rulesPopupEN">
                             <h2 id="rulesResultEN">
@@ -443,8 +437,8 @@ export default function MagicMarble({ socket }) {
                             </ul>
                         </div>
                     </div>
-                    <div id="top-panel-right">
-                        <div>
+                    <div className='flex align-middle ml-2 gap-1 my-auto'>
+                        <div className='my-auto'>
                             <input id="language-switch" type="checkbox" value={language} onChange={(e) => {
                                 setLanguage(language === 'en' ? 'ru' : 'en');
                             }} />
@@ -454,7 +448,7 @@ export default function MagicMarble({ socket }) {
                                 <div className={language === 'en' ? '' : 'hidden'} id="en">EN</div>
                             </label>
                         </div>
-                        <button id="play" onClick={playAudio}>
+                        <button className='my-auto' id="play" onClick={playAudio}>
                             <svg
                                 width="23"
                                 height="21"
@@ -475,20 +469,25 @@ export default function MagicMarble({ socket }) {
                         ></audio>
                     </div>
                 </div>
-                <div id="top-header">
-                    <div>MAGIC</div>
-                    <div>MARBLE</div>
+                <div className='block flex-col mx-auto gap-2 md:hidden'>
+                    <p id='header1' className='text-[#8b30d2] text-4xl text-center'>MAGIC MARBLE</p>
+                    <img className='w-56 mx-auto' src="/images/central-logo.svg" alt="image-mobile" />
                 </div>
-                <img id="img-mobile" src="/images/central-logo.svg" alt="" />
-                <img id="img-wide" src="/images/renewed-logo.svg" alt="" />
+                <div className='relative hidden md:block'>
+                    <p id='header2' className='absolute inset-0 grid place-content-center text-4xl text-[#d9d9d9]'>MAGIC MARBLE</p>
+                    <img className='w-full' src="/images/renewed-logo.svg" alt="image-wide" />
+                </div>
             </div>
-            <div id="main-bot">
-                <div id="bot-left">
+            <div className='flex'>
+                <div className='flex flex-col w-full md:w-[65%] md:p-5'>
                     <div id="layer-p2">
                         <div className="info">
-                            <img className={'inline-block w-10 h-10 rounded-full' + ((playerTwo.playerId !== '') ? '' : ' hidden')}
-                                src="https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg"
-                                alt="Avatar of Jonathan Reinink" />
+                            {playerTwo.playerId &&
+                                <img className='inline-block w-10 h-10 rounded-full'
+                                    src="https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg"
+                                    alt="Avatar of Jonathan Reinink"
+                                />
+                            }
                             <div>
                                 <div className="name two">{playerTwo.username}</div>
                                 <div className="role two">{playerTwo.role}</div>
@@ -506,9 +505,12 @@ export default function MagicMarble({ socket }) {
                     </div>
                     <div id="layer-p1">
                         <div className="info">
-                            <img className={'inline-block w-10 h-10 rounded-full' + ((playerOne.playerId !== '') ? '' : ' hidden')}
-                                src="https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg"
-                                alt="Avatar of Jonathan Reinink" />
+                            {playerOne.playerId &&
+                                <img className='inline-block w-10 h-10 rounded-full'
+                                    src="https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg"
+                                    alt="Avatar of Jonathan Reinink"
+                                />
+                            }
                             <div>
                                 <div className="name one">{playerOne.username}</div>
                                 <div className="role one">{playerOne.role}</div>
@@ -526,7 +528,7 @@ export default function MagicMarble({ socket }) {
                     </div>
                     <div id='layer-bet' style={{ display: (playerOne.playerToPlay === playerOne.no && playerOne.score > 0 && playerTwo.score > 0) ? 'flex' : 'none' }}>
                         <div className='text-center flex gap-2 align-middle bg-[#1c2258] md:bg-[#0e1232] text-white text-2xl md:text-3xl px-2 pt-2 pb-1 rounded-xl'>
-                            <img className='w-8 h-8' src='/images/pac-marble.png'></img>
+                            <img className='w-8 h-8' src='/images/pac-marble.png' alt="pac-marble" />
                             <span>
                                 {betCounterText}
                             </span>
@@ -578,7 +580,7 @@ export default function MagicMarble({ socket }) {
                         <button className="game-button" onClick={handleSubmit}>Submit</button>
                     </div>
                 </div>
-                <div id="bot-right">
+                <div className='flex absolute w-full bottom-0 justify-center md:w-[35%] md:static md:flex-col'>
                     <div id="layer-stats">
                         {playerOne.playerId &&
                             <>
@@ -647,7 +649,7 @@ export default function MagicMarble({ socket }) {
                         }
                     </div>
                     <div id="layer-chat" className="down z-0">
-                        <img className="swipe-img" src="/icons/arrow.svg" alt="" />
+                        <img className="swipe-img" src="/icons/arrow.svg" alt="arrow" />
                         <div className="swipe-info">Swipe up to see history and chat</div>
                         <div className="chat-info rounded-lg overflow-y-auto z-10">
                             {playerOne.logs.map((log, index) => (
@@ -676,7 +678,11 @@ export default function MagicMarble({ socket }) {
                                         type="text"
                                         value={message}
                                         onChange={(e) => setMessage(e.target.value)}
-                                        onKeyDown={(e) => { if (e.key == "enter") setMessage(e.target.value) }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                sendMessage(e);
+                                            }
+                                        }}
                                         placeholder="Tap to send a message"
                                     />
                                     <button onClick={sendMessage} className="bg-green-400 text-white text-sm my-auto p-2 m-0 rounded-md">

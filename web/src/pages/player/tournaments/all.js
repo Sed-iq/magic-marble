@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import Loading from '../../../components/Loading';
 
 import { GetUser, PlayerGetAllTournaments, JoinTournament } from '../../../utils';
 
-export default function All({socket, username, isAdmin, changeUrl}) {
+export default function All({ socket, username, isAdmin, changeUrl }) {
+    const [isLoading01, setIsLoading01] = useState(true);
+    const [isLoading02, setIsLoading02] = useState(true);
     const [upcomingTournaments, setUpcomingTournaments] = useState([]);
     const [liveTournaments, setLiveTournaments] = useState([]);
 
@@ -41,30 +44,30 @@ export default function All({socket, username, isAdmin, changeUrl}) {
 
     function renderTournament(key, status, tournament) {
         return (
-            <div key={key} className="bg-gray-100 dark:bg-gray-900 my-2 rounded w-64 flex-shrink-0">
+            <div key={key} className="bg-gray-900 my-2 rounded w-64 flex-shrink-0">
                 <div className="relative flex flex-col p-4">
-                    <p className="mb-2 text-xl font-medium text-gray-700 dark:text-gray-500">
+                    <p className="mb-2 text-xl font-bold text-gray-300">
                         {tournament.name}
                     </p>
-                    <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                    <p className="mb-2 text-sm font-medium text-gray-400">
                         {tournament.description}
                     </p>
-                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                    <p className="text-xs font-semibold text-gray-400">
                         <i className="fa-solid fa-users"></i> {tournament.playersArr.length}/{tournament.maxPlayers}
                     </p>
-                    <p className="text-xs mt-1 font-semibold text-gray-500 dark:text-gray-400">
-                        <i className={"fa-solid" + (status === 'upcmoing' ? " fa-hourglass-start" : "fa-check")}></i> {new Date(tournament.startDateTime).toLocaleDateString()} {new Date(tournament.startDateTime).toLocaleTimeString()}
+                    <p className="text-xs mt-1 font-semibold text-gray-400">
+                        <i className={"fa-solid" + (status === 'upcoming' ? " fa-hourglass-start" : " fa-check")}></i> {new Date(tournament.startDateTime).toLocaleDateString()} {new Date(tournament.startDateTime).toLocaleTimeString()}
                     </p>
-                    <p className="text-xs mt-1 font-semibold text-red-500 dark:text-red-400">
-                        {dateToAgo(new Date(tournament.startDateTime))}
+                    <p className="absolute right-2 top-0 text-sm mt-1 font-semibold text-red-400">
+                        <i className="animate-pulse fa-solid fa-clock"></i> {dateToAgo(new Date(tournament.startDateTime))}
                     </p>
                     <div className="grid grid-cols-2 gap-2">
                         <button onClick={(e) => changeUrl('/player/tournaments/view?id=' + tournament.id)}
-                            className="px-6 py-2 w-fit mt-4 text-sm font-medium leading-5 text-green-500 dark:text-green-600 transition-colors duration-150 bg-green-100 dark:bg-transparent border border-transparent dark:border-green-600 rounded-lg active:bg-green-600 hover:bg-green-700 hover:text-white dark:hover:bg-green-700 dark:hover:text-white focus:outline-none focus:shadow-outline-green">
+                            className="px-6 py-2 w-fit mt-4 text-sm font-medium leading-5 text-green-600 transition-colors duration-150 bg-transparent border border-transparent border-green-600 rounded-lg active:bg-green-600 hover:bg-green-700 hover:text-white focus:outline-none focus:shadow-outline-green">
                             View
                         </button>
                         {(status === 'upcoming') ? <button onClick={(e) => joinTournament(tournament.id)}
-                            className="px-6 py-2 mt-4 text-sm font-medium leading-5 text-indigo-500 dark:text-indigo-600 transition-colors duration-150 bg-indigo-100 dark:bg-transparent border border-transparent dark:border-indigo-600 rounded-lg active:bg-indigo-600 hover:bg-indigo-700 hover:text-white dark:hover:bg-indigo-700 dark:hover:text-white focus:outline-none focus:shadow-outline-indigo">
+                            className="animate-pulse px-6 py-2 mt-4 text-sm font-medium leading-5 text-indigo-600 transition-colors duration-150 bg-transparent border border-transparent border-indigo-600 rounded-lg active:bg-indigo-600 hover:bg-indigo-700 hover:text-white focus:outline-none focus:shadow-outline-indigo">
                             Join
                         </button> : null}
                     </div>
@@ -78,14 +81,18 @@ export default function All({socket, username, isAdmin, changeUrl}) {
         if (result) {
             if (status === 'upcoming') {
                 setUpcomingTournaments(result);
+                setIsLoading01(false);
             }
             else if (status === 'live') {
                 setLiveTournaments(result);
+                setIsLoading02(false);
             }
         }
     }
 
     useEffect(() => {
+        setIsLoading01(true);
+        setIsLoading02(true);
         const asyncFunc = async () => {
             const user = await GetUser(socket);
             if (!user || user.isAdmin) {
@@ -97,12 +104,12 @@ export default function All({socket, username, isAdmin, changeUrl}) {
             }
         }
         asyncFunc();
-    },[socket]);
+    }, [socket]);
 
     return (
         <main className="h-full overflow-y-auto">
             <div className="container px-6 mx-auto grid">
-                <h2 className="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
+                <h2 className="my-6 text-2xl font-semibold text-gray-200">
                     All Tournaments
                 </h2>
                 <div
@@ -111,35 +118,45 @@ export default function All({socket, username, isAdmin, changeUrl}) {
                         <span>You can browse any tournament</span>
                     </div>
                 </div>
-                <div className="px-4 py-4 bg-white rounded-lg overflow-auto shadow-md dark:bg-gray-800">
+                <div className="px-4 py-4 mb-8 rounded-lg overflow-auto shadow-md bg-gray-800">
                     <div className="w-full overflow-x-auto mb-4">
-                        <h4 className="font-semibold text-gray-600 dark:text-gray-300">
-                            <i className="fa-solid fa-circle text-green-600"></i> Upcoming Tournaments
+                        <h4 className="font-semibold text-gray-300">
+                            <i className="animate-pulse fa-solid fa-circle text-green-600"></i> Upcoming Tournaments
                         </h4>
-                        <div className="flex mx-3 items-center space-x-6 overflow-x-auto">
-                            {upcomingTournaments.map((tournament, index) => {
+                        <div className="flex mx-4 items-center space-x-6 overflow-x-auto">
+                            {!isLoading01 && upcomingTournaments.map((tournament, index) => {
                                 return renderTournament(index, 'upcoming', tournament);
                             })}
-                            {upcomingTournaments.length === 0 && (
-                                <p className="text-center px-2 py-2 text-sm text-gray-400">
+                            {!isLoading01 && upcomingTournaments.length === 0 && (
+                                <div className="text-center px-2 py-2 text-sm text-gray-400">
                                     No Data To Show
-                                </p>
+                                </div>
+                            )}
+                            {isLoading01 && (
+                                <div className="text-center px-2 py-2 text-sm text-gray-400">
+                                    <Loading />
+                                </div>
                             )}
                         </div>
                     </div>
                     <hr className='border-gray-900'></hr>
                     <div className="w-full mt-2 overflow-x-auto">
-                        <h4 className="font-semibold text-gray-600 dark:text-gray-300">
-                            <i className="fa-solid fa-circle text-red-600"></i> Live Tournaments
+                        <h4 className="font-semibold text-gray-300">
+                            <i className="animate-pulse fa-solid fa-circle text-red-600 duration-150 transition"></i> Live Tournaments
                         </h4>
                         <div className="flex mx-4 items-center space-x-6 overflow-x-auto">
-                            {liveTournaments.map((tournament, index) => {
+                            {!isLoading02 && liveTournaments.map((tournament, index) => {
                                 return renderTournament(index, 'live', tournament);
                             })}
-                            {liveTournaments.length === 0 && (
-                                <p className="text-center px-2 py-2 text-sm text-gray-400">
+                            {!isLoading02 && liveTournaments.length === 0 && (
+                                <div className="text-center px-2 py-2 text-sm text-gray-400">
                                     No Data To Show
-                                </p>
+                                </div>
+                            )}
+                            {isLoading02 && (
+                                <div className="text-center px-2 py-2 text-sm text-gray-400">
+                                    <Loading />
+                                </div>
                             )}
                         </div>
                     </div>

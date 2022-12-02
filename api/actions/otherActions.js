@@ -15,7 +15,6 @@ const getPlayer = async (playerId) => {
 }
 
 const updatePlayerRecord = async (playerId, player) => {
-    console.log(player);
     let result = await User.findOneAndUpdate({ id: playerId }, { total: player.total, wins: player.wins, loses: player.loses });
     if (result) {
         return result;

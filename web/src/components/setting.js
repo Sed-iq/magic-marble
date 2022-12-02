@@ -8,7 +8,7 @@ export default function Setting(props) {
     async function updateUser() {
         const result = await UpdateUser(props.socket, username);
         if (result !== null) {
-            if (result === true) {
+            if (result) {
                 props.setUsername(username);
                 props.changeUrl(((props.isAdmin) ? '/admin/setting' : '/player/setting'));
             }
@@ -21,7 +21,7 @@ export default function Setting(props) {
     async function deleteUser() {
         const result = await DeleteUser(props.socket);
         if (result !== null) {
-            if (result === true) {
+            if (result) {
                 props.changeUrl('/login');
             }
         }
@@ -92,11 +92,11 @@ export default function Setting(props) {
                         You will not able to create account again on this username.
                     </p>
                 </div>
-                <div className="px-4 py-3 mb-8 rounded-lg shadow-md bg-gray-800">
-                    <div className="block text-sm">
-                        <span className="text-gray-400">Are you want to delete your account?</span>
+                <div className="px-4 py-4 mb-8 rounded-lg shadow-md bg-gray-800">
+                    <div className="text-sm flex align-middle">
+                        <span className="my-auto text-gray-400">Are you want to delete your account?</span>
                         <button type="button" onClick={deleteUser}
-                            className="mx-2 px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-transparent border border-red-600 rounded-lg active:bg-red-600 hover:bg-red-700 focus:outline-none focus:shadow-outline-red">
+                            className="mx-2 my-auto px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-transparent border border-red-600 rounded-lg active:bg-red-600 hover:bg-red-700 focus:outline-none focus:shadow-outline-red">
                             Delete Account
                         </button>
                     </div>

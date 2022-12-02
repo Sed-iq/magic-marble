@@ -330,7 +330,7 @@ const addBet = async (data) => {
                     playerOne.round += 1;
                     playerTwo.round = playerOne.round;
 
-                    if (playerOne.score == 0 || playerTwo.score == 0) {
+                    if (playerOne.score === 0 || playerTwo.score === 0) {
                         playerOne.logs = playerOne.logs.concat([{ message: `${roundWinner} ${outcome} and won ${wonAmount} marbles.`, type: 'info' }]);
                         playerOne.logs = playerOne.logs.concat([{ message: `${playerOne.username} bet ${playerOne.bet} as ${playerOne.role} vs ${playerTwo.username}'s ${playerTwo.bet} as ${playerTwo.role}`, type: 'info' }]);
                         playerOne.logs = playerOne.logs.concat([{ message: 'Game Over', type: 'info' }]);
@@ -524,7 +524,7 @@ const messageToAllPlayers = (tournamentId, name, data) => {
         currentTournaments[index].currentPlayers.forEach((player) => {
             var isSent = false;
             activeSockets.forEach(activeSocket => {
-                if (isSent == false) {
+                if (isSent === false) {
                     if (player.playerId === activeSocket.userId) {
                         isSent = true;
                         io.sockets.to(activeSocket.socketId).emit(name, data);

@@ -66,13 +66,13 @@ export default function Sidebar(props) {
                 </button>
                 <hr className='border-gray-900 mt-[0.5px]'></hr>
                 <ul className="mt-0">
-                    {props.openendPage == 'Dashboard' ?
+                    {props.openendPage === 'Dashboard' ?
                         activeBtn('Dashboard', 'fas fa-house', '/player/dashboard')
                         :
                         inactiveBtn('Dashboard', 'fas fa-house', '/player/dashboard')
                     }
                     <li className="relative px-6 py-3">
-                        {props.openendPage == 'Tournaments' ?
+                        {props.openendPage === 'Tournaments' ?
                             <>
                                 <span className="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>
                                 <button className="inline-flex items-center justify-between w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-200 text-gray-100"
@@ -112,12 +112,12 @@ export default function Sidebar(props) {
                             : null
                         }
                     </li>
-                    {props.openendPage == 'Profile' ?
+                    {props.openendPage === 'Profile' ?
                         activeBtn('Profile', 'fas fa-user', '/player/profile')
                         :
                         inactiveBtn('Profile', 'fas fa-user', '/player/profile')
                     }
-                    {props.openendPage == 'Setting' ?
+                    {props.openendPage === 'Setting' ?
                         activeBtn('Setting', 'fas fa-cog', '/player/setting')
                         :
                         inactiveBtn('Setting', 'fas fa-cog', '/player/setting')

@@ -3,7 +3,6 @@ const bodyParser = require("body-parser");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const cors = require('cors');
-const dotenv = require('dotenv');
 
 const connectDB = require('./database/mongoose.js');
 
@@ -19,15 +18,11 @@ const { register, login, updateUser, deleteUser, getUser, getAllPlayers, createT
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
-// const WEB_URL = 'http://localhost:5500';
-// const WEB_URL = "https://illustrious-bombolone-823bb2.netlify.app";
-// const WEB_URL = "https://magicmarble-web.herokuapp.com";
-const WEB_URL = "https://magicmarble-web-k3cap.ondigitalocean.app";
-// const CONN_URL = 'mongodb://localhost:27017/marblesDB';
+const WEB_URL = 'http://localhost:3001';
+// const WEB_URL = "https://magicmarble-web-k3cap.ondigitalocean.app";
 const CONN_URL = 'mongodb+srv://tajammal:FtSTFcuiutGj5A6y@marblesdbcluster.w7hc4a9.mongodb.net/?retryWrites=true&w=majority';
 
 

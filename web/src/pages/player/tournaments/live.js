@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import Loading from '../../../components/Loading';
 
 import { GetUser, PlayerGetAllTournaments } from '../../../utils';
 
 export default function Live({ socket, username, isAdmin, changeUrl }) {
+    const [isLoading, setIsLoading] = useState(true);
     const [tournaments, setTournaments] = useState([]);
 
     async function loadTournaments() {
         const result = await PlayerGetAllTournaments(socket, 'live', 'getPlayerTournaments')
         if (result) {
             setTournaments(result);
+            setIsLoading(false);
         }
     }
 
     useEffect(() => {
+        setIsLoading(true);
         const asyncFunc = async () => {
             const user = await GetUser(socket);
             if (!user || user.isAdmin) {
@@ -55,7 +59,7 @@ export default function Live({ socket, username, isAdmin, changeUrl }) {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-700 bg-gray-800">
-                                {tournaments.map((tournament, index) => (
+                                {!isLoading && tournaments.map((tournament, index) => (
                                     <tr key={index} className="text-gray-400">
                                         <td className="px-4 py-3">
                                             <p className="font-semibold">{tournament.name}</p>
@@ -86,11 +90,18 @@ export default function Live({ socket, username, isAdmin, changeUrl }) {
                                         </td>
                                     </tr>
                                 ))}
-                                {tournaments.length === 0 && (
+                                {!isLoading && tournaments.length === 0 && (
                                     <tr className="text-gray-400">
                                         <td colSpan="6" className="text-center px-4 py-3">No Live tournaments</td>
                                     </tr>
                                 )}
+                                {isLoading &&
+                                    <tr className="text-gray-400">
+                                        <td colSpan="6" className="text-center px-4 py-3">
+                                            <Loading />
+                                        </td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     </div>

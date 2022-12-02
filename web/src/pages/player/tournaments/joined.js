@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import Loading from '../../../components/Loading';
 
 import { GetUser, PlayerGetAllTournaments, LeaveTournament } from '../../../utils';
 
 export default function Joined(socket, username, isAdmin, changeUrl) {
+    const [isLoading, setIsLoading] = useState(true);
     const [tournaments, setTournaments] = useState([]);
 
     async function leaveTournament(tournamentId) {
@@ -21,10 +23,12 @@ export default function Joined(socket, username, isAdmin, changeUrl) {
         const result = await PlayerGetAllTournaments(socket, 'upcoming', 'getPlayerTournaments')
         if (result) {
             setTournaments(result);
+            setIsLoading(false);
         }
     }
 
     useEffect(() => {
+        setIsLoading(true);
         const asyncFunc = async () => {
             const user = await GetUser(socket);
             if (!user || user.isAdmin) {
@@ -35,12 +39,12 @@ export default function Joined(socket, username, isAdmin, changeUrl) {
             }
         }
         asyncFunc();
-    },[socket]);
+    }, [socket]);
 
     return (
         <main className="h-full overflow-y-auto">
             <div className="container px-6 mx-auto grid">
-                <h2 className="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
+                <h2 className="my-6 text-2xl font-semibold text-gray-200">
                     Joined Tournaments
                 </h2>
                 <div
@@ -49,15 +53,15 @@ export default function Joined(socket, username, isAdmin, changeUrl) {
                         <span>You can leave any tournament</span>
                     </div>
                 </div>
-                <div className="px-4 py-4 mb-8 bg-white rounded-lg overflow-auto shadow-md dark:bg-gray-800">
+                <div className="px-4 py-4 mb-8 rounded-lg overflow-auto shadow-md bg-gray-800">
                     <div className="w-full overflow-x-auto">
-                        <h4 className="mb-4 font-semibold text-gray-600 dark:text-gray-300">
+                        <h4 className="mb-4 font-semibold text-gray-300">
                             These all are tournaments that you joined.
                         </h4>
                         <table className="w-full whitespace-no-wrap">
                             <thead>
                                 <tr
-                                    className="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+                                    className="text-xs font-semibold tracking-wide text-left uppercase border-b border-gray-700 text-gray-400 bg-gray-800">
                                     <th className="px-4 py-3">Name</th>
                                     <th className="px-4 py-3">Current Players</th>
                                     <th className="px-4 py-3">Max Players</th>
@@ -68,7 +72,7 @@ export default function Joined(socket, username, isAdmin, changeUrl) {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-700 bg-gray-800">
-                                {tournaments.map((tournament, index) => (
+                                {!isLoading && tournaments.map((tournament, index) => (
                                     <tr key={index} className="text-gray-400">
                                         <td className="px-4 py-3">
                                             <p className="font-semibold">{tournament.name}</p>
@@ -106,9 +110,16 @@ export default function Joined(socket, username, isAdmin, changeUrl) {
                                         </td>
                                     </tr>
                                 ))}
-                                {tournaments.length === 0 &&
+                                {!isLoading && tournaments.length === 0 &&
                                     <tr className="text-gray-400">
-                                        <td colSpan="6" className="text-center px-4 py-3">No Joined tournaments</td>
+                                        <td colSpan="7" className="text-center px-4 py-3">No Joined tournaments</td>
+                                    </tr>
+                                }
+                                {isLoading &&
+                                    <tr className="text-gray-400">
+                                        <td colSpan="7" className="text-center px-4 py-3">
+                                            <Loading />
+                                        </td>
                                     </tr>
                                 }
                             </tbody>

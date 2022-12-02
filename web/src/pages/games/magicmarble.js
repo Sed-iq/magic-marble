@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Loading from '../../components/Loading';
 
 import { GetUser } from '../../utils';
 
@@ -41,7 +42,7 @@ export default function MagicMarble({ socket }) {
     const [popupResult, setPopupResult] = useState(null);
     const [language, setLanguage] = useState('en');
     const [counterText, setCounterText] = useState('');
-    const [betCounterText, setBetCounterText] = useState('');
+    const [betCounterText, setBetCounterText] = useState('00:00');
 
     const navigate = useNavigate();
 
@@ -217,10 +218,10 @@ export default function MagicMarble({ socket }) {
                 return;
             }
 
-            setBetCounterText('');
-            setSelectedAmount(1);
-            setSelectedChoice('even');
             socket.emit('addedbet', { tournamentId: tournamentId, player: playerOne });
+            setBetCounterText('00:00');
+            setSelectedChoice('even');
+            setSelectedAmount(1);
             playerOne.playerToPlay = 0;
             playerTwo.playerToPlay = 0;
             setPlayerOne(playerOne);
@@ -308,7 +309,7 @@ export default function MagicMarble({ socket }) {
 
                         socket.on("autoAddBet", (data) => {
                             if (window.location.pathname === "/games/magicmarble") {
-                                setBetCounterText("");
+                                setBetCounterText("00:00");
                                 setSelectedAmount(1);
                             }
                         });
@@ -493,6 +494,11 @@ export default function MagicMarble({ socket }) {
                                 <div className="role two">{playerTwo.role}</div>
                             </div>
                         </div>
+                        {!playerTwo.playerId &&
+                            <div className='grid place-content-center w-full h-full'>
+                                <Loading />
+                            </div>
+                        }
                         <div className="score two">{playerTwo.score}</div>
                         <div className="marbles two">
                             {renderMarbles(playerTwo.score)}
@@ -508,13 +514,18 @@ export default function MagicMarble({ socket }) {
                                 <div className="role one">{playerOne.role}</div>
                             </div>
                         </div>
+                        {!playerOne.playerId &&
+                            <div className='grid place-content-center w-full h-full'>
+                                <Loading />
+                            </div>
+                        }
                         <div className="score one">{playerOne.score}</div>
                         <div className="marbles one">
                             {renderMarbles(playerOne.score)}
                         </div>
                     </div>
                     <div id='layer-bet' style={{ display: (playerOne.playerToPlay === playerOne.no && playerOne.score > 0 && playerTwo.score > 0) ? 'flex' : 'none' }}>
-                        <div className={'text-center flex gap-2 align-middle bg-[#1c2258] md:bg-[#0e1232] text-white text-2xl md:text-3xl px-2 pt-2 pb-1 rounded-xl' + (betCounterText === '' ? ' hidden' : '')}>
+                        <div className='text-center flex gap-2 align-middle bg-[#1c2258] md:bg-[#0e1232] text-white text-2xl md:text-3xl px-2 pt-2 pb-1 rounded-xl'>
                             <img className='w-8 h-8' src='/images/pac-marble.png'></img>
                             <span>
                                 {betCounterText}
@@ -569,62 +580,71 @@ export default function MagicMarble({ socket }) {
                 </div>
                 <div id="bot-right">
                     <div id="layer-stats">
-                        <div id="stats-left">
-                            <div id="tournament-info">
-                                <div id="tournament-name">Tournament</div>
-                                <div id="tournament-prize">
-                                    <div id="tournament-prize-sum">20000</div>
-                                    <div id="tournament-prize-currency">USDT</div>
+                        {playerOne.playerId &&
+                            <>
+                                <div id="stats-left">
+                                    <div id="tournament-info">
+                                        <div id="tournament-name">Tournament</div>
+                                        <div id="tournament-prize">
+                                            <div id="tournament-prize-sum">20000</div>
+                                            <div id="tournament-prize-currency">USDT</div>
+                                        </div>
+                                        <div>Prize</div>
+                                    </div>
+                                    <div id="tournament-stats">
+                                        <div className="tournament-stats">
+                                            <div id="current-round">{playerOne.totalRounds}</div>
+                                            <div>Current round</div>
+                                        </div>
+                                        <div className="tournament-stats">
+                                            <div id="rounds-to-prize">6</div>
+                                            <div>Rounds to prize</div>
+                                        </div>
+                                        <div className="tournament-stats">
+                                            <div id="number-of-players">1024</div>
+                                            <div>Number of players</div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>Prize</div>
-                            </div>
-                            <div id="tournament-stats">
-                                <div className="tournament-stats">
-                                    <div id="current-round">{playerOne.totalRounds}</div>
-                                    <div>Current round</div>
+                                <div id="stats-right">
+                                    <div className="stats-line one">
+                                        <div className="pointer">You are here</div>
+                                        <div className="amount">20k</div>
+                                    </div>
+                                    <div className="stats-line  two">
+                                        <div className="pointer">You are here</div>
+                                        <div className="amount">10k</div>
+                                    </div>
+                                    <div className="stats-line three">
+                                        <div className="pointer">You are here</div>
+                                        <div className="amount">5k</div>
+                                    </div>
+                                    <div className="stats-line four">
+                                        <div className="pointer">You are here</div>
+                                    </div>
+                                    <div className="stats-line five">
+                                        <div className="pointer">You are here</div>
+                                    </div>
+                                    <div className="stats-line six">
+                                        <div className="pointer">You are here</div>
+                                    </div>
+                                    <div className="stats-line seven">
+                                        <div className="pointer">You are here</div>
+                                    </div>
+                                    <div className="stats-line eight">
+                                        <div className="pointer">You are here</div>
+                                    </div>
+                                    <div className="stats-line nine">
+                                        <div className="pointer current">You are here</div>
+                                    </div>
                                 </div>
-                                <div className="tournament-stats">
-                                    <div id="rounds-to-prize">6</div>
-                                    <div>Rounds to prize</div>
-                                </div>
-                                <div className="tournament-stats">
-                                    <div id="number-of-players">1024</div>
-                                    <div>Number of players</div>
-                                </div>
+                            </>
+                        }
+                        {!playerOne.playerId &&
+                            <div className='grid place-content-center w-full h-full'>
+                                <Loading />
                             </div>
-                        </div>
-                        <div id="stats-right">
-                            <div className="stats-line one">
-                                <div className="pointer">You are here</div>
-                                <div className="amount">20k</div>
-                            </div>
-                            <div className="stats-line  two">
-                                <div className="pointer">You are here</div>
-                                <div className="amount">10k</div>
-                            </div>
-                            <div className="stats-line three">
-                                <div className="pointer">You are here</div>
-                                <div className="amount">5k</div>
-                            </div>
-                            <div className="stats-line four">
-                                <div className="pointer">You are here</div>
-                            </div>
-                            <div className="stats-line five">
-                                <div className="pointer">You are here</div>
-                            </div>
-                            <div className="stats-line six">
-                                <div className="pointer">You are here</div>
-                            </div>
-                            <div className="stats-line seven">
-                                <div className="pointer">You are here</div>
-                            </div>
-                            <div className="stats-line eight">
-                                <div className="pointer">You are here</div>
-                            </div>
-                            <div className="stats-line nine">
-                                <div className="pointer current">You are here</div>
-                            </div>
-                        </div>
+                        }
                     </div>
                     <div id="layer-chat" className="down z-0">
                         <img className="swipe-img" src="/icons/arrow.svg" alt="" />
@@ -642,29 +662,38 @@ export default function MagicMarble({ socket }) {
                                     }
                                 </p>
                             ))}
+                            {!playerOne.playerId &&
+                                <div className='grid place-content-center w-full h-full'>
+                                    <Loading />
+                                </div>
+                            }
                         </div>
-                        <div className='chat-prompt' style={{ display: (playerOne.playerId !== '' ? 'flex' : 'none') }}>
-                            <div>
-                                <input
-                                    id="message"
-                                    type="text"
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="Tap to send a message"
-                                />
-                                <button onClick={sendMessage} className="bg-green-400 text-white text-sm my-auto p-2 m-0 rounded-md">
-                                    Send
-                                </button>
-                            </div>
-                        </div>
+                        {playerOne.playerId &&
+                            <div className='chat-prompt'>
+                                <div>
+                                    <input
+                                        id="message"
+                                        type="text"
+                                        value={message}
+                                        onChange={(e) => setMessage(e.target.value)}
+                                        onKeyDown={(e) => { if (e.key == "enter") setMessage(e.target.value) }}
+                                        placeholder="Tap to send a message"
+                                    />
+                                    <button onClick={sendMessage} className="bg-green-400 text-white text-sm my-auto p-2 m-0 rounded-md">
+                                        Send
+                                    </button>
+                                </div>
+                            </div>}
                     </div>
                 </div>
             </div>
-            <div id="popup" className={(isOpenPopup ? '' : 'hidden')}>
-                <div id="popupResult">
-                    {popupResult}
+            {isOpenPopup &&
+                <div id="popup">
+                    <div id="popupResult">
+                        {popupResult}
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     );
 }

@@ -55,17 +55,8 @@ export default function Create({socket, username, isAdmin, changeUrl}) {
         e.preventDefault();
         const result = await CreateTournament(socket, name, description, rules, tournamentType, prizeAndDistribution, timePerMove, timeBetweenRounds, maxParticipants, optionalLink, dateTime);
         if (result !== null) {
-            if (result === true) {
-                setName('');
-                setRules('Guesser determines the wager amount');
-                setTournamentType('Single Elimination');
-                setTimePerMove('10');
-                setMaxParticipants('2');
-                setTimeBetweenRounds('10');
-                setDateTime('');
-                setDescription('');
-                setPrizeAndDistribution('');
-                setOptionalLink('');
+            if (result) {
+                changeUrl('/admin/tournaments/upcoming');
             }
         }
         else {
@@ -95,7 +86,7 @@ export default function Create({socket, username, isAdmin, changeUrl}) {
                         <span>After creating tournament, players will able to browse</span>
                     </div>
                 </div>
-                <div className="px-4 py-4 rounded-lg shadow-md bg-gray-800">
+                <div className="px-4 py-4 mb-8 rounded-lg shadow-md bg-gray-800">
                     <h4 className="mb-4 font-semibold text-gray-300">
                         Create a New Tournaments
                     </h4>

@@ -2,10 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import {API_URL, WEB_URL} from './utils';
+
 import io from 'socket.io-client';
 
 import './index.css';
-
 
 import Home from './pages/index';
 import Login from './pages/login';
@@ -16,10 +17,9 @@ import Admin from './pages/admin/admin';
 import Player from './pages/player/player';
 import MagicMarble from './pages/games/magicmarble';
 
-const WEB_URL = 'https://squid-app-mtjl8.ondigitalocean.app';
 
 // connecting to socket server (API)
-let socket = io(process.env.REACT_APP_API_URL, {
+let socket = io(API_URL, {
   transports: ['websocket']
 });
 

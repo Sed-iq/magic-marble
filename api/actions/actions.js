@@ -32,7 +32,6 @@ const register = (req, res) => {
         let id = 0;
         User.find({}, (err, users) => {
             if (err) {
-                console.log(err);
                 return res.status(500).json({ error: err._message });
             }
             if (users.length > 0) {
@@ -205,22 +204,22 @@ const getAllPlayers = (req, res) => {
         if (!user.isAdmin) {
             return res.status(400).json({ error: 'User is not admin' });
         }
-        User.find({}, (err, users) => {
+        User.find({ isAdmin: false }, async (err, users) => {
             if (err) {
                 return res.status(500).json({ error: err._message });
             }
             let usersWithoutPassword = [];
-            users.forEach(user => {
-                if (!user.isAdmin) {
-                    let userWithoutPassword = {
-                        username: user.username,
-                        tournamentsArr: user.tournamentsArr,
-                        status: user.status,
-                        createDateTime: user.createDateTime,
-                    };
-                    usersWithoutPassword.push(userWithoutPassword);
-                }
-            });
+            for (let user of users) {
+                const tournaments = await Tournament.find({ status: 'completed', winnerId: user.id });
+                let userWithoutPassword = {
+                    username: user.username,
+                    tournamentsArr: user.tournamentsArr,
+                    wins: tournaments.length,
+                    status: user.status,
+                    createDateTime: user.createDateTime,
+                };
+                usersWithoutPassword.push(userWithoutPassword);
+            }
             return res.status(200).json({ players: usersWithoutPassword });
         });
     });

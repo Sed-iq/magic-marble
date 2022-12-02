@@ -56,7 +56,7 @@ export default function View({socket, username, isAdmin, changeUrl}) {
         e.preventDefault();
         const result = await UpdateTournament(socket, tournamentId, name, description, rules, tournamentType, prizeAndDistribution, timePerMove, timeBetweenRounds, maxParticipants, dateTime, optionalLink);
         if (result !== null) {
-            if (result === true) {
+            if (result) {
                 changeUrl('/admin/tournaments/upcoming');
             }
         }
@@ -143,7 +143,7 @@ export default function View({socket, username, isAdmin, changeUrl}) {
     return (
         <main className="h-full overflow-y-auto">
             <div className="container px-6 mx-auto grid">
-                <h2 className="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
+                <h2 className="my-6 text-2xl font-semibold text-gray-200">
                     Edit Tournament
                 </h2>
                 <div
@@ -152,8 +152,8 @@ export default function View({socket, username, isAdmin, changeUrl}) {
                         <span>You can not update name of tournament.</span>
                     </div>
                 </div>
-                <div className="px-4 py-4 bg-white rounded-lg shadow-md dark:bg-gray-800">
-                    <h4 className="mb-4 font-semibold text-gray-600 dark:text-gray-300">
+                <div className="px-4 py-4 mb-8 rounded-lg shadow-md bg-gray-800">
+                    <h4 className="mb-4 font-semibold text-gray-300">
                         Edit details of Tournament.
                     </h4>
                     <form method="POST" onSubmit={updateTournament}>

@@ -214,9 +214,7 @@ const getAllPlayers = (req, res) => {
                 if (!user.isAdmin) {
                     let userWithoutPassword = {
                         username: user.username,
-                        total: user.total,
-                        wins: user.wins,
-                        loses: user.loses,
+                        tournamentsArr: user.tournamentsArr,
                         status: user.status,
                         createDateTime: user.createDateTime,
                     };

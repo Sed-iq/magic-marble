@@ -54,8 +54,6 @@ export default function Players({socket, username, isAdmin, changeUrl}) {
                                     className="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
                                     <th className="px-4 py-3">Username</th>
                                     <th className="px-4 py-3">Total Tournaments</th>
-                                    <th className="px-4 py-3">Won Tournaments</th>
-                                    <th className="px-4 py-3">Loses Tournaments</th>
                                     <th className="px-4 py-3">Status</th>
                                     <th className="px-4 py-3">Date & Time</th>
                                 </tr>
@@ -68,13 +66,7 @@ export default function Players({socket, username, isAdmin, changeUrl}) {
                                                 {player.username}
                                             </td>
                                             <td className="px-4 py-3 text-sm">
-                                                {player.total}
-                                            </td>
-                                            <td className="px-4 py-3 text-sm">
-                                                {player.wins}
-                                            </td>
-                                            <td className="px-4 py-3 text-sm">
-                                                {player.loses}
+                                                {player.tournamentsArr? player.tournamentsArr.length:0}
                                             </td>
                                             <td className="px-4 py-3 text-xs">
                                                 {player.status === 'active' ?

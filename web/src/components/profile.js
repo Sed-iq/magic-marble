@@ -2,16 +2,16 @@ import React, { useEffect } from 'react';
 
 import { GetUser } from '../utils';
 
-export default function Profile(props) {
+export default function Profile({ socket, username, isAdmin, changeUrl }) {
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(props.socket);
-            if (!user || user.isAdmin !== props.isAdmin) {
-                props.changeUrl('/login');
+            const user = await GetUser(socket);
+            if (!user || user.isAdmin !== isAdmin) {
+                changeUrl('/login');
             }
         }
         asyncFunc();
-    },[]);
+    }, [socket]);
 
     return (
         <main className="h-full overflow-y-auto">
@@ -28,7 +28,7 @@ export default function Profile(props) {
                     <label className="block text-sm">
                         <span className="text-gray-400">Username</span>
                         <input className="block w-full mt-1 px-2 py-2 rounded text-sm border-gray-600 bg-gray-700 focus:border-purple-400 focus:outline-none text-gray-300 focus:shadow-outline-gray form-input"
-                            value={props.username} disabled />
+                            value={username} disabled />
                     </label>
                     <label className="block mt-2 text-sm">
                         <span className="text-gray-400">Password</span>
@@ -45,13 +45,13 @@ export default function Profile(props) {
                             <label className="inline-flex items-center text-gray-400">
                                 <input type="radio"
                                     className="w-4 h-4 cursor-pointer accent-purple-600 form-radio focus:outline-none"
-                                    name="accountType" value="admin" checked={props.isAdmin ? true : false} onChange={(e) => { }} />
+                                    name="accountType" value="admin" checked={isAdmin ? true : false} onChange={(e) => { }} />
                                 <span className="ml-2">Admin</span>
                             </label>
                             <label className="inline-flex items-center ml-6 text-gray-400">
                                 <input type="radio"
                                     className="w-4 h-4 cursor-pointer accent-purple-600 form-radio focus:outline-none"
-                                    name="accountType" value="player" checked={props.isAdmin ? false : true} onChange={(e) => { }} />
+                                    name="accountType" value="player" checked={isAdmin ? false : true} onChange={(e) => { }} />
                                 <span className="ml-2">Player</span>
                             </label>
                         </div>

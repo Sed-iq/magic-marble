@@ -1,9 +1,9 @@
 import React from 'react';
 
-export default function Navbar(props) {
+export default function Navbar({ socket, sideBarOpen, toggleSideBar, changeUrl }) {
     function logoutUser() {
         localStorage.removeItem('token');
-        props.changeUrl('/login');
+        changeUrl('/login');
     }
 
     return (
@@ -11,8 +11,8 @@ export default function Navbar(props) {
             <div
                 className="py-2 flex items-center justify-between h-full px-6 mx-auto text-purple-300">
                 <button className="p-1 mr-5 -ml-1 md:hidden rounded-md focus:outline-none focus:shadow-outline-purple" aria-label="Menu"
-                    onClick={props.toggleSideBar}>
-                    {props.sideBarOpen ?
+                    onClick={toggleSideBar}>
+                    {sideBarOpen ?
                         <i className="fa-solid fa-xmark"></i>
                         :
                         <i className="fa-solid fa-bars-staggered"></i>
@@ -21,7 +21,7 @@ export default function Navbar(props) {
                 <div className="lg:mr-32"></div>
                 <ul className="flex items-center flex-shrink-0 space-x-6">
                     <li className="relative">
-                        {(props.socket) ? <i className="w-5 h-5 fa-solid fa-wifi"></i> : <i className="w-5 h-5 fa-solid fa-wifi-slash"></i>}
+                        {(socket) ? <i className="w-5 h-5 fa-solid fa-wifi"></i> : <i className="w-5 h-5 fa-solid fa-wifi-slash"></i>}
                     </li>
                     <li className="relative">
                         <button onClick={logoutUser}

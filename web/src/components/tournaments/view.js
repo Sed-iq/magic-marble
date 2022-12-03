@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser, GetATournament } from '../../utils';
 
-export default function View(props) {
+export default function View({ socket, username, isAdmin, changeUrl }) {
     const [tournament, setTournament] = useState({});
 
     async function loadTournament(userId, tournamentId) {
-        const result = await GetATournament(props.socket, tournamentId);
+        const result = await GetATournament(socket, tournamentId);
         if (result) {
             setTournament(result);
         }
@@ -14,9 +14,9 @@ export default function View(props) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(props.socket);
-            if (!user || user.isAdmin !== props.isAdmin) {
-                props.changeUrl('/login');
+            const user = await GetUser(socket);
+            if (!user || user.isAdmin !== isAdmin) {
+                changeUrl('/login');
             }
             else {
                 if (window.location.href.split('?')[1]) {
@@ -25,26 +25,26 @@ export default function View(props) {
                         loadTournament(user.id, tournamentId);
                     }
                     else {
-                        if (props.isAdmin) {
-                            props.changeUrl('/admin/dashboard');
+                        if (isAdmin) {
+                            changeUrl('/admin/dashboard');
                         }
                         else {
-                            props.changeUrl('/player/dashboard');
+                            changeUrl('/player/dashboard');
                         }
                     }
                 }
                 else {
-                    if (props.isAdmin) {
-                        props.changeUrl('/admin/dashboard');
+                    if (isAdmin) {
+                        changeUrl('/admin/dashboard');
                     }
                     else {
-                        props.changeUrl('/player/dashboard');
+                        changeUrl('/player/dashboard');
                     }
                 }
             }
         }
         asyncFunc();
-    },[]);
+    }, [socket]);
 
     return (
         <main className="h-full overflow-y-auto">

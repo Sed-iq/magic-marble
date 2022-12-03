@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { GetUser, LoginUser } from '../utils';
 
-export default function Login(props) {
+export default function Login({socket}) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
@@ -35,7 +35,7 @@ export default function Login(props) {
     }
 
     async function loadUser() {
-        const user = await GetUser(props.socket);
+        const user = await GetUser(socket);
         if (user) {
             if (user.isAdmin) {
                 navigate('/admin/dashboard');
@@ -51,7 +51,7 @@ export default function Login(props) {
             await loadUser();
         }
         asyncFunc();
-    },[]);
+    },[socket]);
 
     return (
         <div className="flex items-center min-h-screen p-6 bg-gray-900">

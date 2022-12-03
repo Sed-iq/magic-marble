@@ -19,10 +19,10 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5500;
 
-const WEB_URL = 'http://localhost:3001';
-// const WEB_URL = "https://squid-app-mtjl8.ondigitalocean.app";
+// const WEB_URL = 'http://localhost:3000';
+const WEB_URL = "https://squid-app-mtjl8.ondigitalocean.app";
 const CONN_URL = 'mongodb+srv://tajammal:FtSTFcuiutGj5A6y@marblesdbcluster.w7hc4a9.mongodb.net/?retryWrites=true&w=majority';
 
 

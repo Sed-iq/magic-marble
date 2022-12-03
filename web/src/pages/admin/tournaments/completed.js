@@ -77,7 +77,7 @@ export default function Completed({ socket, username, isAdmin, changeUrl }) {
                                             <p className="font-semibold">{new Date(tournament.startDateTime).toLocaleDateString()} - {new Date(tournament.startDateTime).toLocaleTimeString()}</p>
                                         </td>
                                         <td className="px-4 py-3 text-sm">
-                                            <p className="font-semibold">${new Date(tournament.endDateTime).toLocaleDateString()} - ${new Date(tournament.endDateTime).toLocaleTimeString()}</p>
+                                            <p className="font-semibold">{new Date(tournament.endDateTime).toLocaleDateString()} - {new Date(tournament.endDateTime).toLocaleTimeString()}</p>
                                         </td>
                                     </tr>
                                 ))}

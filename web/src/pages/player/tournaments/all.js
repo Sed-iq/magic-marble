@@ -4,6 +4,7 @@ import Loading from '../../../components/Loading';
 import { GetUser, PlayerGetAllTournaments, JoinTournament } from '../../../utils';
 
 export default function All({ socket, username, isAdmin, changeUrl }) {
+    const [popupAllowed, setPopupAllowed] = useState(true);
     const [isLoading01, setIsLoading01] = useState(true);
     const [isLoading02, setIsLoading02] = useState(true);
     const [upcomingTournaments, setUpcomingTournaments] = useState([]);
@@ -100,6 +101,15 @@ export default function All({ socket, username, isAdmin, changeUrl }) {
             else {
                 loadTournaments('upcoming');
                 loadTournaments('live');
+
+                let tempWindow = window.open('', 'tempWindow', 'height=100,width=100,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,directories=no,status=no');
+                if (tempWindow) {
+                    tempWindow.close();
+                    setPopupAllowed(true);
+                }
+                else {
+                    setPopupAllowed(false);
+                }
             }
         }
         asyncFunc();
@@ -117,50 +127,67 @@ export default function All({ socket, username, isAdmin, changeUrl }) {
                         <span>You can browse any tournament</span>
                     </div>
                 </div>
-                <div className="px-4 py-4 mb-8 rounded-lg overflow-auto shadow-md bg-gray-800">
-                    <div className="w-full overflow-x-auto mb-4">
-                        <h4 className="font-semibold text-gray-300">
-                            <i className="animate-pulse fa-solid fa-circle text-green-600"></i> Upcoming Tournaments
-                        </h4>
-                        <div className="flex mx-4 items-center space-x-6 overflow-x-auto">
-                            {!isLoading01 && upcomingTournaments.map((tournament, index) => {
-                                return renderTournament(index, 'upcoming', tournament);
-                            })}
-                            {!isLoading01 && upcomingTournaments.length === 0 && (
-                                <div className="text-center px-2 py-2 text-sm text-gray-400">
-                                    No Data To Show
-                                </div>
-                            )}
-                            {isLoading01 && (
-                                <div className="text-center px-2 py-2 text-sm text-gray-400">
-                                    <Loading />
-                                </div>
-                            )}
+                {popupAllowed ?
+                    <div className="px-4 py-4 mb-8 rounded-lg overflow-auto shadow-md bg-gray-800">
+                        <div className="w-full overflow-x-auto mb-4">
+                            <h4 className="font-semibold text-gray-300">
+                                <i className="animate-pulse fa-solid fa-circle text-green-600"></i> Upcoming Tournaments
+                            </h4>
+                            <div className="flex mx-4 items-center space-x-6 overflow-x-auto">
+                                {!isLoading01 && upcomingTournaments.map((tournament, index) => {
+                                    return renderTournament(index, 'upcoming', tournament);
+                                })}
+                                {!isLoading01 && upcomingTournaments.length === 0 && (
+                                    <div className="text-center px-2 py-2 text-sm text-gray-400">
+                                        No Data To Show
+                                    </div>
+                                )}
+                                {isLoading01 && (
+                                    <div className="text-center px-2 py-2 text-sm text-gray-400">
+                                        <Loading />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <hr className='border-gray-900'></hr>
+                        <div className="w-full mt-2 overflow-x-auto">
+                            <h4 className="font-semibold text-gray-300">
+                                <i className="animate-pulse fa-solid fa-circle text-red-600 duration-150 transition"></i> Live Tournaments
+                            </h4>
+                            <div className="flex mx-4 items-center space-x-6 overflow-x-auto">
+                                {!isLoading02 && liveTournaments.map((tournament, index) => {
+                                    return renderTournament(index, 'live', tournament);
+                                })}
+                                {!isLoading02 && liveTournaments.length === 0 && (
+                                    <div className="text-center px-2 py-2 text-sm text-gray-400">
+                                        No Data To Show
+                                    </div>
+                                )}
+                                {isLoading02 && (
+                                    <div className="text-center px-2 py-2 text-sm text-gray-400">
+                                        <Loading />
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
-                    <hr className='border-gray-900'></hr>
-                    <div className="w-full mt-2 overflow-x-auto">
-                        <h4 className="font-semibold text-gray-300">
-                            <i className="animate-pulse fa-solid fa-circle text-red-600 duration-150 transition"></i> Live Tournaments
-                        </h4>
-                        <div className="flex mx-4 items-center space-x-6 overflow-x-auto">
-                            {!isLoading02 && liveTournaments.map((tournament, index) => {
-                                return renderTournament(index, 'live', tournament);
-                            })}
-                            {!isLoading02 && liveTournaments.length === 0 && (
-                                <div className="text-center px-2 py-2 text-sm text-gray-400">
-                                    No Data To Show
-                                </div>
-                            )}
-                            {isLoading02 && (
-                                <div className="text-center px-2 py-2 text-sm text-gray-400">
-                                    <Loading />
-                                </div>
-                            )}
+                    :
+                    <div className="px-4 py-4 mb-8 rounded-lg overflow-auto shadow-md bg-gray-800">
+                        <div className="w-full overflow-x-auto mb-4">
+                            <h4 className="font-semibold text-gray-300">
+                                Popup is blocked!
+                            </h4>
+                        </div>
+                        <div className="text-sm mb-2 text-gray-400">
+                            You have need to do these steps first to see the tournaments.
+                        </div>
+                        <div className='flex gap-2'>
+                            <img className='rounded shadow-md h-64' src="/images/step01.png" alt="Open Window Blocked" />
+                            <img className='rounded shadow-md h-64' src="/images/step02.png" alt="Open Window Blocked" />
                         </div>
                     </div>
-                </div>
+                }
             </div>
-        </main>
+        </main >
     );
 }

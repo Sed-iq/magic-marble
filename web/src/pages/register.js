@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { RegisterUser } from '../utils';
 
-export default function Register() {
+export default function Register({socket}) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");

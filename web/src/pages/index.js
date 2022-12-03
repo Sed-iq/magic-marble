@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from "react-router-dom";
 
-export default function Home() {
+export default function Home({socket}) {
     return (
         <div className="flex items-center min-h-screen p-6 bg-gray-900">
             <div className="flex-1 h-full max-w-2xl mx-auto overflow-hidden rounded-lg shadow-xl bg-gray-800">

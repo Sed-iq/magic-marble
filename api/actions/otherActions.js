@@ -6,16 +6,8 @@
 const Tournament = require('../models/tournament');
 const User = require('../models/user');
 
-const getPlayer = async (playerId) => {
-    let result = await User.findOne({ id: playerId });
-    if (result) {
-        return result;
-    }
-    return null;
-}
-
-const updatePlayerRecord = async (playerId, player) => {
-    let result = await User.findOneAndUpdate({ id: playerId }, { total: player.total, wins: player.wins, loses: player.loses });
+const getUser = async (userId) => {
+    let result = await User.findOne({ id: userId });
     if (result) {
         return result;
     }
@@ -64,8 +56,7 @@ const setTournamentRoundPlayersArr = async (tournamentId, roundPlayersArr) => {
 }
 
 module.exports = {
-    updatePlayerRecord,
-    getPlayer,
+    getUser,
     getTournament,
     getAllTournaments,
     setTournamentLive,

@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 
-export default function Sidebar(props) {
-    const [menuBarOpen, setMenuBarOpen] = useState(false);
+export default function Sidebar({ socket, username, isAdmin, sideBarOpen, openendPage, changeUrl }) {
+    const [menuBarOpen, setMenuBarOpen] = useState((localStorage.getItem('menuBarOpen') === 'true') || false);
 
     function logoutUser() {
         localStorage.removeItem('token');
-        props.changeUrl('/login');
+        changeUrl('/login');
     }
 
     function toggleMenuBar() {
+        localStorage.setItem('menuBarOpen', !menuBarOpen);
         setMenuBarOpen(!menuBarOpen);
     }
 
@@ -18,7 +19,7 @@ export default function Sidebar(props) {
 
                 <span className="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg"></span>
                 <button className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-200 text-gray-100"
-                    onClick={(e) => props.changeUrl(url)}>
+                    onClick={(e) => changeUrl(url)}>
                     <i className={"ml-1 " + icon}></i>
                     <span className="ml-4">{name}</span>
                 </button>
@@ -30,7 +31,7 @@ export default function Sidebar(props) {
         return (
             <li className="relative px-6 py-3">
                 <button className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-200"
-                    onClick={(e) => props.changeUrl(url)}>
+                    onClick={(e) => changeUrl(url)}>
                     <i className={"ml-1 " + icon}></i>
                     <span className="ml-4">{name}</span>
                 </button>
@@ -58,21 +59,21 @@ export default function Sidebar(props) {
         return (
             <div className="py-0 text-gray-400">
                 <button id="username2" className="py-4 ml-6 text-lg font-bold text-gray-200"
-                    onClick={(e) => props.changeUrl('/player/dashboard')}>
+                    onClick={(e) => changeUrl('/player/dashboard')}>
                     <img className="inline-block w-10 h-10 mr-2 rounded-full"
                         src="https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg"
                         alt="Avatar of Jonathan Reinink" />
-                    <span className="align-middle">{props.username}</span>
+                    <span className="align-middle">{username}</span>
                 </button>
                 <hr className='border-gray-900 mt-[0.5px]'></hr>
                 <ul className="mt-0">
-                    {props.openendPage === 'Dashboard' ?
+                    {openendPage === 'Dashboard' ?
                         activeBtn('Dashboard', 'fas fa-house', '/player/dashboard')
                         :
                         inactiveBtn('Dashboard', 'fas fa-house', '/player/dashboard')
                     }
                     <li className="relative px-6 py-3">
-                        {props.openendPage === 'Tournaments' ?
+                        {openendPage === 'Tournaments' ?
                             <>
                                 <span className="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>
                                 <button className="inline-flex items-center justify-between w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-200 text-gray-100"
@@ -89,22 +90,22 @@ export default function Sidebar(props) {
                         {menuBarOpen ?
                             <ul className="p-2 mt-2 space-y-2 overflow-hidden text-sm font-medium rounded-md shadow-inner text-gray-400 bg-gray-900 transition-all duration-700">
                                 <li className="px-2 py-1 transition-colors duration-150 hover:text-gray-200">
-                                    <button onClick={(e) => props.changeUrl('/player/tournaments/all')}>
+                                    <button onClick={(e) => changeUrl('/player/tournaments/all')}>
                                         All
                                     </button>
                                 </li>
                                 <li className="px-2 py-1 transition-colors duration-150 hover:text-gray-200">
-                                    <button onClick={(e) => props.changeUrl('/player/tournaments/joined')}>
+                                    <button onClick={(e) => changeUrl('/player/tournaments/joined')}>
                                         Joined
                                     </button>
                                 </li>
                                 <li className="px-2 py-1 transition-colors duration-150 hover:text-gray-200">
-                                    <button onClick={(e) => props.changeUrl('/player/tournaments/live')}>
+                                    <button onClick={(e) => changeUrl('/player/tournaments/live')}>
                                         Live
                                     </button>
                                 </li>
                                 <li className="px-2 py-1 transition-colors duration-150 hover:text-gray-200">
-                                    <button onClick={(e) => props.changeUrl('/player/tournaments/played')}>
+                                    <button onClick={(e) => changeUrl('/player/tournaments/played')}>
                                         Played
                                     </button>
                                 </li>
@@ -112,12 +113,12 @@ export default function Sidebar(props) {
                             : null
                         }
                     </li>
-                    {props.openendPage === 'Profile' ?
+                    {openendPage === 'Profile' ?
                         activeBtn('Profile', 'fas fa-user', '/player/profile')
                         :
                         inactiveBtn('Profile', 'fas fa-user', '/player/profile')
                     }
-                    {props.openendPage === 'Setting' ?
+                    {openendPage === 'Setting' ?
                         activeBtn('Setting', 'fas fa-cog', '/player/setting')
                         :
                         inactiveBtn('Setting', 'fas fa-cog', '/player/setting')
@@ -137,11 +138,11 @@ export default function Sidebar(props) {
 
     return (
         <>
-            {props.sideBarOpen ?
+            <aside className="shadow-lg z-20 hidden w-64 overflow-y-auto bg-gray-800 md:block flex-shrink-0" >
+                {sidebar()}
+            </aside >
+            {sideBarOpen ?
                 <>
-                    <aside className="shadow-lg z-20 hidden w-64 overflow-y-auto bg-gray-800 md:block flex-shrink-0" >
-                        {sidebar()}
-                    </aside >
                     <div className="fixed inset-0 z-10 flex items-end bg-black bg-opacity-50 sm:items-center sm:justify-center md:hidden"></div>
                     <aside className="fixed shadow-lg inset-y-0 z-20 flex-shrink-0 w-64 mt-16 overflow-y-auto bg-gray-800 md:hidden transition-all duration-700">
                         {sidebar()}

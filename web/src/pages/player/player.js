@@ -17,7 +17,7 @@ import View from '../../components/tournaments/view';
 import { GetUser } from '../../utils';
 
 export default function Player({socket}) {
-    const [sideBarOpen, setSideBarOpen] = useState(true);
+    const [sideBarOpen, setSideBarOpen] = useState(localStorage.getItem('sideBarOpen') === 'true' || false);
     const [openendPage, setOpenedPage] = useState('Dashboard');
     const [username, setUsername] = useState('Admin');
 
@@ -29,6 +29,7 @@ export default function Player({socket}) {
     }
 
     function toggleSideBar() {
+        localStorage.setItem('sideBarOpen', !sideBarOpen);
         setSideBarOpen(!sideBarOpen);
     }
 

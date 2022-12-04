@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import {API_URL, WEB_URL} from './utils';
+import { API_URL, WEB_URL } from './utils';
 
 import io from 'socket.io-client';
 
@@ -35,9 +35,8 @@ socket.on("notify", (data) => {
   }
   else {
     alert(`Windows blocked to open new tab. Link is: ${WEB_URL}/games/magicmarble?id=${data.tournamentId}`);
+    localStorage.setItem("allowPopup", false);
   }
-  alert("Your tournament has been lived.");
-  window.location.reload();
 });
 
 // disconnect socket when user close the tab or browser or refresh the page

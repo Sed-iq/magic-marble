@@ -117,6 +117,11 @@ export default function Sidebar({ socket, username, isAdmin, sideBarOpen, openen
                             : null
                         }
                     </li>
+                    {openendPage === 'Wallet' ?
+                        activeBtn('Wallet', 'fas fa-wallet', '/admin/wallet')
+                        :
+                        inactiveBtn('Wallet', 'fas fa-wallet', '/admin/wallet')
+                    }
                     {openendPage === 'Players' ?
                         activeBtn('Players', 'fas fa-users', '/admin/players')
                         :

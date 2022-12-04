@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { GetUser, UpdateUser, DeleteUser } from '../utils';
+import { GetUser, UpdateUser, DeleteUser } from '../../utils';
 
 export default function Setting({ socket, username, isAdmin, setUsername, changeUrl }) {
     const [tempUsername, setTempUsername] = useState(username);
@@ -10,7 +10,7 @@ export default function Setting({ socket, username, isAdmin, setUsername, change
         if (result !== null) {
             if (result) {
                 setUsername(tempUsername);
-                changeUrl(((isAdmin) ? '/admin/setting' : '/player/setting'));
+                changeUrl('/admin/setting');
             }
         }
         else {
@@ -33,7 +33,7 @@ export default function Setting({ socket, username, isAdmin, setUsername, change
     useEffect(() => {
         const asyncFunc = async () => {
             const user = await GetUser(socket);
-            if (!user || user.isAdmin !== isAdmin) {
+            if (!user || user.isAdmin === false) {
                 changeUrl('/login');
             }
         }
@@ -65,13 +65,13 @@ export default function Setting({ socket, username, isAdmin, setUsername, change
                             <label className="inline-flex items-center text-gray-400">
                                 <input type="radio"
                                     className="w-4 h-4 cursor-pointer accent-purple-600 form-radio focus:outline-none"
-                                    name="accountType" value="admin" checked={isAdmin ? true : false} onChange={(e) => { }} />
+                                    name="accountType" value="admin" checked={true} onChange={(e) => { }} />
                                 <span className="ml-2">Admin</span>
                             </label>
                             <label className="inline-flex items-center ml-6 text-gray-400">
                                 <input type="radio"
                                     className="w-4 h-4 cursor-pointer accent-purple-600 form-radio focus:outline-none"
-                                    name="accountType" value="player" checked={isAdmin ? false : true} onChange={(e) => { }} />
+                                    name="accountType" value="player" checked={false} onChange={(e) => { }} />
                                 <span className="ml-2">Player</span>
                             </label>
                         </div>
@@ -81,7 +81,7 @@ export default function Setting({ socket, username, isAdmin, setUsername, change
                             className="mx-2 px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
                             Update
                         </button>
-                        <button onClick={(e) => changeUrl(isAdmin ? "/admin/setting" : "/player/setting")}
+                        <button onClick={(e) => changeUrl("/admin/setting")}
                             className="mx-2 px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-transparent border border-purple-600 rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
                             Cancel
                         </button>

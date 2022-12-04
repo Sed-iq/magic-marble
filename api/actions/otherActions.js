@@ -39,7 +39,7 @@ const setTournamentLive = async (tournamentId) => {
 }
 
 const setTournamentCompleted = async (tournamentId, winnerId) => {
-    let winner = await getPlayer(winnerId);
+    let winner = await getUser(winnerId);
     let result = await Tournament.findOneAndUpdate({ id: tournamentId }, { status: "completed", winnerId: winnerId, winner: winner.username });
     if (result) {
         return result;

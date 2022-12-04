@@ -5,16 +5,17 @@ import Navbar from '../../components/navbar';
 import Sidebar from '../../components/admin/sidebar';
 
 import Dashboard from './dashboard';
+import Wallet from './wallet';
 import Players from './players';
-import Profile from '../../components/profile';
-import Setting from '../../components/setting';
+import Profile from './profile';
+import Setting from './setting';
 import Create from './tournaments/create';
 import Deleted from './tournaments/deleted';
 import Edit from './tournaments/edit';
 import Live from './tournaments/live';
 import Completed from './tournaments/completed';
 import Upcoming from './tournaments/upcoming';
-import View from '../../components/tournaments/view';
+import View from './tournaments/view';
 
 import { GetUser } from '../../utils';
 
@@ -38,6 +39,9 @@ export default function Player({ socket }) {
     function checkPage() {
         if (window.location.pathname === '/admin/dashboard') {
             setOpenedPage('Dashboard');
+        }
+        else if (window.location.pathname === '/admin/wallet') {
+            setOpenedPage('Wallet');
         }
         else if (window.location.pathname === '/admin/players') {
             setOpenedPage('Players');
@@ -93,6 +97,7 @@ export default function Player({ socket }) {
                 <Navbar socket={socket} username={username} isAdmin={true} sideBarOpen={sideBarOpen} toggleSideBar={toggleSideBar} changeUrl={changeUrl} />
                 <Routes>
                     <Route path="/dashboard" element={<Dashboard socket={socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
+                    <Route path="/wallet" element={<Wallet socket={socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
                     <Route path="/players" element={<Players socket={socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
                     <Route path="/profile" element={<Profile socket={socket} username={username} isAdmin={true} changeUrl={changeUrl} />} />
                     <Route path="/setting" element={<Setting socket={socket} username={username} isAdmin={true} setUsername={setUsername} changeUrl={changeUrl} />} />

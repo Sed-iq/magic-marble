@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { GetUser, GetATournament } from '../../utils';
+import { GetUser, GetATournament } from '../../../utils';
 
 export default function View({ socket, username, isAdmin, changeUrl }) {
     const [tournament, setTournament] = useState({});
@@ -15,7 +15,7 @@ export default function View({ socket, username, isAdmin, changeUrl }) {
     useEffect(() => {
         const asyncFunc = async () => {
             const user = await GetUser(socket);
-            if (!user || user.isAdmin !== isAdmin) {
+            if (!user || user.isAdmin === true) {
                 changeUrl('/login');
             }
             else {

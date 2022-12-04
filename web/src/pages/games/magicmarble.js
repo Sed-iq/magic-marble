@@ -368,6 +368,10 @@ export default function MagicMarble({ socket }) {
             setIsOpenPopup(true);
             setPopupResult(result);
         }
+        let logsDiv = document.getElementById('logs');
+        if (logsDiv) {
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
     }, [playerOne, playerTwo]);
 
     return (
@@ -377,7 +381,10 @@ export default function MagicMarble({ socket }) {
             }
             <div className='relative flex flex-col gap-2 mb-6'>
                 <div className='w-full relative text-[#d9d9d9] flex align-middle justify-between md:justify-end px-2 py-4 top-2'>
-                    <a className="transition my-auto cursor-pointer font-bold" id="rules" onClick={showRules}>Game rules</a>
+                    <div className='flex align-middle gap-3 my-auto'>
+                        <a className="transition my-auto cursor-pointer font-bold" onClick={(e) => changeUrl('/player/dashboard')}>Home page</a>
+                        <a className="transition my-auto cursor-pointer font-bold" id="rules" onClick={showRules}>Game rules</a>
+                    </div>
                     <div id="rulesEN" className="overlay">
                         <div className="rulesPopupEN">
                             <h2 id="rulesResultEN">
@@ -622,7 +629,7 @@ export default function MagicMarble({ socket }) {
                     <div id="layer-chat" className="down z-0">
                         <img className="swipe-img" src="/icons/arrow.svg" alt="arrow" />
                         <div className="swipe-info">Swipe up to see history and chat</div>
-                        <div className="chat-info rounded-lg overflow-y-auto z-10">
+                        <div className="chat-info rounded-lg overflow-y-auto z-10" id='logs'>
                             {playerOne.logs.length > 0 ?
                                 playerOne.logs.map((log, index) => (
                                     <p key={index} className="">

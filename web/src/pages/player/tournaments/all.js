@@ -4,7 +4,7 @@ import Loading from '../../../components/Loading';
 import { GetUser, PlayerGetAllTournaments, JoinTournament } from '../../../utils';
 
 export default function All({ socket, username, isAdmin, changeUrl }) {
-    const [popupAllowed, setPopupAllowed] = useState(true);
+    const [popupAllowed, setPopupAllowed] = useState('');
     const [isLoading01, setIsLoading01] = useState(true);
     const [isLoading02, setIsLoading02] = useState(true);
     const [upcomingTournaments, setUpcomingTournaments] = useState([]);
@@ -101,18 +101,18 @@ export default function All({ socket, username, isAdmin, changeUrl }) {
             else {
                 loadTournaments('upcoming');
                 loadTournaments('live');
-
-                let tempWindow = window.open('', 'tempWindow', 'height=100,width=100,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,directories=no,status=no');
-                if (tempWindow) {
-                    tempWindow.close();
-                    setPopupAllowed(true);
-                }
-                else {
-                    setPopupAllowed(false);
-                }
             }
         }
-        asyncFunc();
+        let tempWindow = window.open('', 'tempWindow', 'toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,directories=no,status=no');
+        tempWindow.blur();
+        if (!tempWindow || tempWindow.closed || typeof tempWindow.closed == 'undefined') {
+            setPopupAllowed('No');
+        }
+        else {
+            asyncFunc();
+            tempWindow.close();
+            setPopupAllowed('Yes');
+        }
     }, [socket]);
 
     return (
@@ -127,7 +127,7 @@ export default function All({ socket, username, isAdmin, changeUrl }) {
                         <span>You can browse any tournament</span>
                     </div>
                 </div>
-                {popupAllowed ?
+                {popupAllowed === 'Yes' ?
                     <div className="px-4 py-4 mb-8 rounded-lg overflow-auto shadow-md bg-gray-800">
                         <div className="w-full overflow-x-auto mb-4">
                             <h4 className="font-semibold text-gray-300">
@@ -172,20 +172,23 @@ export default function All({ socket, username, isAdmin, changeUrl }) {
                         </div>
                     </div>
                     :
-                    <div className="px-4 py-4 mb-8 rounded-lg overflow-auto shadow-md bg-gray-800">
-                        <div className="w-full overflow-x-auto mb-4">
-                            <h4 className="font-semibold text-gray-300">
-                                Popup is blocked!
-                            </h4>
+                    popupAllowed === 'No' ?
+                        <div className="px-4 py-4 mb-8 rounded-lg overflow-auto shadow-md bg-gray-800">
+                            <div className="w-full overflow-x-auto mb-4">
+                                <h4 className="font-semibold text-gray-300">
+                                    Popup is blocked!
+                                </h4>
+                            </div>
+                            <div className="text-sm mb-2 text-gray-400">
+                                You have need to do these steps first to see the tournaments.
+                            </div>
+                            <div className='flex gap-2'>
+                                <img className='rounded shadow-md h-64' src="/images/step01.png" alt="Open Window Blocked" />
+                                <img className='rounded shadow-md h-64' src="/images/step02.png" alt="Open Window Blocked" />
+                            </div>
                         </div>
-                        <div className="text-sm mb-2 text-gray-400">
-                            You have need to do these steps first to see the tournaments.
-                        </div>
-                        <div className='flex gap-2'>
-                            <img className='rounded shadow-md h-64' src="/images/step01.png" alt="Open Window Blocked" />
-                            <img className='rounded shadow-md h-64' src="/images/step02.png" alt="Open Window Blocked" />
-                        </div>
-                    </div>
+                        :
+                        <Loading />
                 }
             </div>
         </main >

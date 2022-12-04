@@ -5,18 +5,19 @@ import Navbar from '../../components/navbar';
 import Sidebar from '../../components/player/sidebar';
 
 import Dashboard from './dashboard';
-import Profile from '../../components/profile';
-import Setting from '../../components/setting';
+import Wallet from './wallet';
+import Profile from './profile';
+import Setting from './setting';
 import All from './tournaments/all';
 import Joined from './tournaments/joined';
 import Live from './tournaments/live';
 import Played from './tournaments/played';
-import View from '../../components/tournaments/view';
+import View from './tournaments/view';
 
 
 import { GetUser } from '../../utils';
 
-export default function Player({socket}) {
+export default function Player({ socket }) {
     const [sideBarOpen, setSideBarOpen] = useState(localStorage.getItem('sideBarOpen') === 'true' || false);
     const [openendPage, setOpenedPage] = useState('Dashboard');
     const [username, setUsername] = useState('Admin');
@@ -36,6 +37,8 @@ export default function Player({socket}) {
     function checkPage() {
         if (window.location.pathname === '/player/dashboard') {
             setOpenedPage('Dashboard');
+        } else if (window.location.pathname === '/player/wallet') {
+            setOpenedPage('Wallet');
         } else if (window.location.pathname === '/player/profile') {
             setOpenedPage('Profile');
         } else if (window.location.pathname === '/player/setting') {
@@ -65,7 +68,7 @@ export default function Player({socket}) {
             }
         }
         asyncFunc();
-    },[socket]);
+    }, [socket]);
 
 
     return (
@@ -75,6 +78,7 @@ export default function Player({socket}) {
                 <Navbar socket={socket} username={username} isAdmin={false} sideBarOpen={sideBarOpen} toggleSideBar={toggleSideBar} changeUrl={changeUrl} />
                 <Routes>
                     <Route path="/dashboard" element={<Dashboard socket={socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
+                    <Route path="/wallet" element={<Wallet socket={socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
                     <Route path="/profile" element={<Profile socket={socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />
                     <Route path="/setting" element={<Setting socket={socket} username={username} isAdmin={false} setUsername={setUsername} changeUrl={changeUrl} />} />
                     <Route path="/tournaments/all" element={<All socket={socket} username={username} isAdmin={false} changeUrl={changeUrl} />} />

@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 
-import { GetUser } from '../utils';
+import { GetUser } from '../../utils';
 
 export default function Profile({ socket, username, isAdmin, changeUrl }) {
     useEffect(() => {
         const asyncFunc = async () => {
             const user = await GetUser(socket);
-            if (!user || user.isAdmin !== isAdmin) {
+            if (!user || user.isAdmin === true) {
                 changeUrl('/login');
             }
         }
@@ -45,13 +45,13 @@ export default function Profile({ socket, username, isAdmin, changeUrl }) {
                             <label className="inline-flex items-center text-gray-400">
                                 <input type="radio"
                                     className="w-4 h-4 cursor-pointer accent-purple-600 form-radio focus:outline-none"
-                                    name="accountType" value="admin" checked={isAdmin ? true : false} onChange={(e) => { }} />
+                                    name="accountType" value="admin" checked={false} onChange={(e) => { }} />
                                 <span className="ml-2">Admin</span>
                             </label>
                             <label className="inline-flex items-center ml-6 text-gray-400">
                                 <input type="radio"
                                     className="w-4 h-4 cursor-pointer accent-purple-600 form-radio focus:outline-none"
-                                    name="accountType" value="player" checked={isAdmin ? false : true} onChange={(e) => { }} />
+                                    name="accountType" value="player" checked={true} onChange={(e) => { }} />
                                 <span className="ml-2">Player</span>
                             </label>
                         </div>

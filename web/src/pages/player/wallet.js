@@ -140,7 +140,7 @@ export default function Wallet({ socket, username, isAdmin, changeUrl }) {
                             <h3 className="mt-2 text-sm text-center font-semibold text-gray-300">
                                 Address
                             </h3>
-                            <img src="/images/QR Code.png" alt="QR Code" className='w-32 h-32 mx-auto my-4' />
+                            <img src="/images/QR-code.png" alt="QR-Code" className='w-32 h-32 mx-auto my-4' />
                             <p className="text-gray-400 text-center my-2 mt-4">
                                 asfaskjlhakjfhalkfbakfhsakjfhakfhsafhsafa
                                 <button className='text-purple-500 ml-2'>

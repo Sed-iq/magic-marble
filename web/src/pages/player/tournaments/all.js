@@ -104,7 +104,6 @@ export default function All({ socket, username, isAdmin, changeUrl }) {
             }
         }
         let tempWindow = window.open('', 'tempWindow', 'toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,directories=no,status=no');
-        tempWindow.blur();
         if (!tempWindow || tempWindow.closed || typeof tempWindow.closed == 'undefined') {
             setPopupAllowed('No');
         }

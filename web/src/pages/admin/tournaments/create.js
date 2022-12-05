@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser, CreateTournament } from '../../../utils';
 
-export default function Create({socket, username, isAdmin, changeUrl}) {
+export default function Create({ socket, username, isAdmin, changeUrl }) {
     const [name, setName] = useState('');
     const [rules, setRules] = useState("Guesser determines the wager amount");
     const [tournamentType, setTournamentType] = useState("Single Elimination");
@@ -13,6 +13,7 @@ export default function Create({socket, username, isAdmin, changeUrl}) {
     const [description, setDescription] = useState('');
     const [prizeAndDistribution, setPrizeAndDistribution] = useState('');
     const [optionalLink, setOptionalLink] = useState('');
+    const [isCreating, setIsCreating] = useState(true);
 
     function handleChanges(e) {
         switch (e.target.name) {
@@ -72,7 +73,7 @@ export default function Create({socket, username, isAdmin, changeUrl}) {
             }
         }
         asyncFunc();
-    },[socket]);
+    }, [socket]);
 
     return (
         <main className="h-full overflow-y-auto">
@@ -196,11 +197,20 @@ export default function Create({socket, username, isAdmin, changeUrl}) {
                                 value={optionalLink} onChange={handleChanges} />
                         </label>
                         <div className="flex items-center justify-end mt-4">
-                            <button type="submit"
-                                className="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
-                                <li className="fas fa-trophy mr-2"></li>
-                                Create NEW Tournament
-                            </button>
+                            {isCreating ?
+                                <button type="submit"
+                                    className="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
+                                    <li className="fas fa-trophy mr-2"></li>
+                                    Create NEW Tournament
+                                </button>
+                                :
+                                // spinner
+                                <button type="submit"
+                                    className="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple" disabled={true}>
+                                    <li className="fas fa-spinner fa-spin mr-2"></li>
+                                    Creating...
+                                </button>
+                            }
                         </div>
                     </form>
                 </div>

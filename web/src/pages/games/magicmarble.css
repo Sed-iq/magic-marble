@@ -347,7 +347,7 @@ body {
 @media (min-width: 850px) {
   #layer-p2 {
     background-color: rgba(28, 34, 88, 0.8);
-    height: 6rem;
+    height: 8rem;
     width: 100%;
     border-radius: 0.5rem;
     margin-top: -1.5rem;
@@ -381,7 +381,7 @@ body {
 #layer-p1 {
   background-color: #0e1232;
   opacity: 1;
-  min-height: 7rem;
+  min-height: 8rem;
   border-radius: 0.5rem;
   margin-top: -1rem;
   padding: 1.5rem;
@@ -943,4 +943,127 @@ body {
   align-items: center;
   place-content: center;
   padding: 5px 10px;
+}
+
+.animate-bot-to-bot {
+  animation: botToBot 4s ease-in-out infinite;
+}
+
+@keyframes botToBot {
+  0% {
+    transform: translateY(4rem);
+    opacity: 0;
+  }
+
+  10% {
+    transform: translateY(0rem);
+    opacity: 1;
+  }
+
+  90% {
+    transform: translateY(0rem);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(4rem);
+    opacity: 0;
+  }
+}
+
+@keyframes smallToBig {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  15% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+
+  20% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  80% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  85% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-small-to-big {
+  animation: smallToBig 4s ease-in-out infinite;
+}
+
+
+@keyframes confetti-slow {
+  0% {
+    transform: translate3d(0, 0, 0) rotateX(0) rotateY(0);
+  }
+
+  100% {
+    transform: translate3d(25px, 105vh, 0) rotateX(360deg) rotateY(180deg);
+  }
+}
+
+@keyframes confetti-medium {
+  0% {
+    transform: translate3d(0, 0, 0) rotateX(0) rotateY(0);
+  }
+
+  100% {
+    transform: translate3d(100px, 105vh, 0) rotateX(100deg) rotateY(360deg);
+  }
+}
+
+@keyframes confetti-fast {
+  0% {
+    transform: translate3d(0, 0, 0) rotateX(0) rotateY(0);
+  }
+
+  100% {
+    transform: translate3d(-50px, 105vh, 0) rotateX(10deg) rotateY(250deg);
+  }
+}
+
+.confetti-container {
+  perspective: 700px;
+  position: absolute;
+  overflow: hidden;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 9999999;
+}
+
+.confetti {
+  position: absolute;
+  z-index: 1;
+  top: -10px;
+  border-radius: 0;
+}
+
+.confetti--animation-slow {
+  animation: confetti-slow 2.25s linear 1 forwards;
+}
+
+.confetti--animation-medium {
+  animation: confetti-medium 1.75s linear 1 forwards;
+}
+
+.confetti--animation-fast {
+  animation: confetti-fast 1.25s linear 1 forwards;
 }

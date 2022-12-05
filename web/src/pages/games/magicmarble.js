@@ -13,7 +13,8 @@ export default function MagicMarble({ socket }) {
     const [playerOne, setPlayerOne] = useState({
         userId: '',
         no: 0,
-        score: null,
+        score: 2,
+        username: '',
         role: null,
         choice: null,
         bet: null,
@@ -21,12 +22,14 @@ export default function MagicMarble({ socket }) {
         isPlaying: false,
         matchWith: null,
         playerToPlay: null,
+        message: null,
         logs: [],
     });
     const [playerTwo, setPlayerTwo] = useState({
         userId: '',
         no: 0,
-        score: null,
+        score: 2,
+        username: null,
         role: null,
         choice: null,
         bet: null,
@@ -36,11 +39,13 @@ export default function MagicMarble({ socket }) {
         playerToPlay: null,
         logs: []
     });
+    const [wonAmount, setWonAmount] = useState(null);
     const [selectedChoice, setSelectedChoice] = useState('even');
     const [selectedAmount, setSelectedAmount] = useState(1);
     const [message, setMessage] = useState('');
+    const [receivedMessage, setReceivedMessage] = useState('');
     const [isOpenPopup, setIsOpenPopup] = useState(false);
-    const [popupResult, setPopupResult] = useState(null);
+    const [popupResult, setPopupResult] = useState();
     const [language, setLanguage] = useState('en');
     const [counterText, setCounterText] = useState('');
     const [betCounterText, setBetCounterText] = useState('');
@@ -107,7 +112,7 @@ export default function MagicMarble({ socket }) {
     function renderPlayer(player) {
         return (
             <>
-                <div className="info">
+                <div className="relative info">
                     <img className='inline-block w-10 h-10 rounded-full'
                         src="https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg"
                         alt="Avatar of Jonathan Reinink"
@@ -116,6 +121,20 @@ export default function MagicMarble({ socket }) {
                         <div className="name">{player.username}</div>
                         <div className="role">{player.role}</div>
                     </div>
+                    {player === playerOne && receivedMessage ?
+                        <div className="animate-bot-to-bot absolute -bottom-10 text-sm bg-[#9ca3af] border rounded bg-gradient-to-br p-2">
+                            <div className="text-white font-medium">{receivedMessage}</div>
+                        </div>
+                        :
+                        null
+                    }
+                    {player === playerOne && wonAmount ?
+                        <div className="animate-small-to-big absolute -bottom-10 text-sm">
+                            <div className="text-green-500 text-5xl font-medium">+{wonAmount}</div>
+                        </div>
+                        :
+                        null
+                    }
                 </div>
                 <div className="score">{player.score}</div>
                 <div className="marbles">
@@ -155,8 +174,8 @@ export default function MagicMarble({ socket }) {
         const swipeImg = document.querySelector('.swipe-img');
         const chatInfo = document.querySelector('.chat-info');
 
-        let touchStartY = 0
-        let touchEndY = 0
+        let touchStartY = 0;
+        let touchEndY = 0;
 
         function checkDirection() {
             if (touchEndY < touchStartY) {
@@ -231,7 +250,6 @@ export default function MagicMarble({ socket }) {
     }
 
     function updateBetCounter(tournament) {
-        console.log(tournament);
         let time = "";
         tournament.currentPlayers.forEach((player) => {
             if (player.userId === userId && playerOne.score > 0 && playerTwo.score > 0) {
@@ -241,11 +259,49 @@ export default function MagicMarble({ socket }) {
                 }
             }
         });
-        console.log(time);
         if (time !== "") {
             setBetCounterText(time);
         }
     }
+
+    const Confettiful = function (el) {
+        let confettiColors = ["#fce18a", "#ff726d", "#b48def", "#f4306d"];
+        let confettiAnimations = ["slow", "medium", "fast"];
+        const containerEl = document.createElement("div");
+        const elPosition = el.style.position;
+        if (elPosition !== "relative" || elPosition !== "absolute") {
+            el.style.position = "relative";
+        }
+        containerEl.classList.add("confetti-container");
+        el.appendChild(containerEl);
+        let confettiInterval = setInterval(() => {
+            const confettiEl = document.createElement("div");
+            const confettiSize = Math.floor(Math.random() * 3) + 7 + "px";
+            const confettiBackground =
+                confettiColors[
+                Math.floor(Math.random() * confettiColors.length)
+                ];
+            const confettiLeft =
+                Math.floor(Math.random() * el.offsetWidth) + "px";
+            const confettiAnimation =
+                confettiAnimations[
+                Math.floor(Math.random() * confettiAnimations.length)
+                ];
+            confettiEl.classList.add(
+                "confetti",
+                "confetti--animation-" + confettiAnimation
+            );
+            confettiEl.style.left = confettiLeft;
+            confettiEl.style.width = confettiSize;
+            confettiEl.style.height = confettiSize;
+            confettiEl.style.backgroundColor = confettiBackground;
+
+            confettiEl.removeTimeout = setTimeout(function () {
+                confettiEl.parentNode.removeChild(confettiEl);
+            }, 3000);
+            containerEl.appendChild(confettiEl);
+        }, 25);
+    };
 
     useEffect(() => {
         const asyncFunc = async () => {
@@ -324,6 +380,36 @@ export default function MagicMarble({ socket }) {
                             }
                         });
 
+                        socket.on("message", (data) => {
+                            if (window.location.pathname === "/games/magicmarble") {
+                                if (data.tournament.id === tournamentId) {
+                                    let { to } = data;
+                                    if (to === playerOne.username) {
+                                        setReceivedMessage(data.message);
+                                        setTimeout(() => {
+                                            setReceivedMessage("");
+                                        }, 4000);
+                                    }
+                                    update(data.tournament);
+                                }
+                            }
+                        });
+
+                        socket.on('winRound', (data) => {
+                            if (window.location.pathname === "/games/magicmarble") {
+                                if (data.tournament.id === tournamentId) {
+                                    let { roundWinner } = data;
+                                    if (roundWinner === playerOne.username) {
+                                        setWonAmount(data.wonAmount);
+                                        setTimeout(() => {
+                                            setWonAmount(null);
+                                        }, 4000);
+                                    }
+                                    update(data.tournament);
+                                }
+                            }
+                        });
+
                         socket.on('endTournament', (data) => {
                             if (window.location.pathname === "/games/magicmarble") {
                                 if (data.tournamentId === tournamentId) {
@@ -355,12 +441,21 @@ export default function MagicMarble({ socket }) {
         }
     }, [tournamentId, userId]);
 
+    useEffect(() => {
+        console.log(receivedMessage)
+    }, [receivedMessage]);
+
 
     useEffect(() => {
         if (playerOne.score === 0 || playerTwo.score === 0) {
             let result = '';
             if (playerTwo.score === 0) {
                 result = (language === 'en') ? 'You won!🥳' : 'Ты победили!🥳';
+                window.confettiful = new Confettiful(document.body);
+                setTimeout(() => {
+                    const confettiContainer = document.querySelector('.confetti-container')
+                    document.body.removeChild(confettiContainer)
+                }, 6000);
             }
             else if (playerOne.score === 0) {
                 result = (language === 'en') ? 'You lost🙁' : 'Ты проиграла🙁';
@@ -638,7 +733,7 @@ export default function MagicMarble({ socket }) {
                                         ) : log.type === "round" ? (
                                             <span className="text-red-500">{log.message}</span>
                                         ) : (
-                                            <span className="text-white">{log.message}</span>
+                                            <span className="text-white"><b>{log.by}</b> - {log.message}</span>
                                         )
                                         }
                                     </p>
@@ -671,6 +766,8 @@ export default function MagicMarble({ socket }) {
                     </div>
                 </div>
             </div>
+
+
             {isOpenPopup &&
                 <div id="popup">
                     <div id="popupResult">

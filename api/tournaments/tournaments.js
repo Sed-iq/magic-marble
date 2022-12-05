@@ -353,7 +353,7 @@ const addBet = async (data) => {
                     currentTournaments[index].currentPlayers[matchWithPlayerIdx] = playerTwo;
 
                     // updating player records
-                    messageToAllSockets(data.tournamentId, "update", { tournament: currentTournaments[index] });
+                    messageToAllSockets(data.tournamentId, "winRound", { roundWinner: roundWinner, wonAmount: wonAmount , tournament: currentTournaments[index] });
 
                     if (playerOne.score > 0 && playerTwo.score > 0) {
                         // Changing Roles
@@ -425,7 +425,7 @@ const addMessage = async (data) => {
             if (matchWithPlayerIdx !== -1) {
                 var playerTwo = currentTournaments[index].currentPlayers[matchWithPlayerIdx];
 
-                playerOne.logs = playerOne.logs.concat([{ message: (data.message + ' by ' + playerOne.username), type: 'message' }]);
+                playerOne.logs = playerOne.logs.concat([{ message: data.message, by: playerOne.username, type: 'message' }]);
                 playerTwo.logs = playerOne.logs;
 
                 // updating player
@@ -433,7 +433,7 @@ const addMessage = async (data) => {
                 currentTournaments[index].currentPlayers[matchWithPlayerIdx] = playerTwo;
 
                 // updating player records
-                messageToAllSockets(data.tournamentId, "update", { tournament: currentTournaments[index] });
+                messageToAllSockets(data.tournamentId, "message", { by: playerOne.username, to: playerTwo.username, message: data.message, tournament: currentTournaments[index] });
             }
         }
     }

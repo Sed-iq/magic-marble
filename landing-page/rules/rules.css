@@ -1,0 +1,457 @@
+@font-face {
+    font-family: SGL;
+    src: url(../../fonts/spacegrotesk/SpaceGrotesk-Light.otf);
+  }
+  
+  @font-face {
+    font-family: SGM;
+    src: url(../../fonts/spacegrotesk/SpaceGrotesk-Medium.otf);
+  }
+  
+  @font-face {
+    font-family: SGB;
+    src: url(../../fonts/spacegrotesk/SpaceGrotesk-Bold.otf);
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    margin: 0;
+    background-color: black;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /*Header styling*/
+  header {
+    gap: 0.5rem;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 0.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
+    border-bottom: 1px solid #292524;
+    background-color: black;
+    z-index: 999;
+    height: 3rem;
+  }
+  
+  #company-header {
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-left: 0rem;
+    font-family: SGB;
+    color: white;
+    text-decoration: none;
+  }
+  
+  #company-header > img {
+    width: 3rem;
+    border-radius: 10rem;
+  }
+  
+  #company-name {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  #center-links {
+    display: flex;
+    gap: 2rem;
+    margin-left: 2rem;
+  }
+  
+  #center-links > a {
+    text-decoration: none;
+    font-family: SGL;
+    font-size: 1.2rem;
+    color: white;
+    border-bottom: 1px solid black;
+  }
+  
+  /*Hover effect start*/
+  #center-links > a {
+    position: relative;
+  }
+  
+  #center-links > a::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    border-radius: 4px;
+    background-color: white;
+    bottom: 0;
+    left: 0;
+    transform-origin: right;
+    transform: scaleX(0);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  #center-links > a:hover::before {
+    transform-origin: left;
+    transform: scaleX(1);
+  }
+  /*Hover effect end*/
+  
+  #right-links {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  #right-links > a {
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.8rem;
+    font-family: SGM;
+    background-color: #292524;
+    color: #fafaf9;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  #right-links > a:hover {
+    box-shadow: 0 5px 15px rgba(213, 209, 215, 0.4);
+  }
+  
+  #right-links > a:last-child {
+    background-color: #fafaf9;
+  }
+  
+  #right-links > a {
+    text-decoration: none;
+    color: #fafaf9;
+    font-size: 1rem;
+  }
+  
+  #right-links > a:last-child {
+    color: black;
+  }
+  
+  
+  
+  /*Header mobile styling*/
+  @media (max-width: 1200px) {
+    header {
+      padding: 0.5rem;
+    }
+  
+    #company-header {
+      font-size: 1rem;
+    }
+  
+    #company-header > img {
+      width: 2.5rem;
+    }
+  
+    #center-links {
+      display: none;
+    }
+  }
+  
+  /*Footer styling*/
+  footer {
+    padding: 0.5rem;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: black;
+  }
+  
+  #footer-wide {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+  }
+  
+  #footer-logos {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  #footer-logos > img {
+    transition: 0.4s;
+    width: 1.5rem;
+    cursor: pointer;
+  }
+  
+  #company-footer {
+    font-family: SGB;
+    font-size: 1.2rem;
+    text-decoration: none;
+    color: white;
+  }
+  
+  #footer-mobile {
+    padding: 0.5rem;
+    height: 2rem;
+    color: #fafaf9;
+    background-color: black;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 5vw;
+    align-items: center;
+    font-family: SGB;
+    border-top: 1px solid #292524;
+    margin-top: auto;
+    z-index: 2;
+  }
+  
+  #footer-mobile > a {
+    text-decoration: none;
+    background-color: black;
+    color: #fafaf9;
+    border: none;
+    font-size: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: SGL;
+    width: 4rem;
+    line-height: 0.8;
+  }
+  
+  /*Footer wide-screen styling*/
+  @media (min-width: 1000px) {
+    footer {
+      font-size: 1.2rem;
+      border-top: 1px solid #292524;
+
+    }
+  
+    #company-footer {
+      font-size: 1.4rem;
+    }
+  
+    #footer-logos > img {
+      width: 1.6rem;
+    }
+  
+    #footer-mobile {
+      display: none;
+    }
+  }
+  
+  /*Footer mobile styling*/
+  @media (max-width: 1000px) {
+    #footer-wide {
+      display: none;
+    }
+  }
+  
+  /*Content styling*/
+  #main-container {
+    color: white;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #rules-header {
+    color: white;
+    margin-top: 6rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    font-family: SGB;
+    font-size: 2.6rem;
+  }
+  
+  #initial,
+  #flow,
+  #example {
+    line-height: 1.5;
+  }
+  
+  #initial {
+    z-index: 1;
+    color: white;
+    padding: 2rem 2rem;
+    background-color: #d1d5db;
+    color: black;
+  }
+  
+  #initial > div {
+    font-family: SGB;
+    font-size: 2rem;
+  }
+  
+  #initial > ul {
+    font-size: 1.2rem;
+    font-family: SGL;
+  }
+  
+  #flow {
+    color: black;
+    background-color: black;
+    color: #d1d5db;
+    padding: 2rem 2rem;
+    z-index: 2;
+  }
+  
+  #flow > div {
+    font-family: SGB;
+    font-size: 2rem;
+  }
+  
+  #initial > ul, #flow > ul {
+    text-decoration: none;
+    margin: 0;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  li > div:first-child {
+    font-size: 1.4rem;
+    font-family: SGM;
+  }
+  
+  li > div:last-child {
+    font-family: SGL;
+    font-size: 1.2rem;
+  }
+  
+  #example {
+    color: white;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #d1d5db;
+    color: black;
+  }
+  
+  #example > div {
+    font-size: 2rem;
+    font-family: SGB;
+    margin-bottom: 2rem;
+  }
+  
+  #example > p {
+    font-family: SGL;
+    font-size: 1.2rem;
+    border: 1px solid black;
+    border-radius: 1rem;
+    text-align: center;
+    padding: 1rem;
+  }
+  
+  #roadmap {
+    color: black;
+    background-color: #d1d5db;
+    padding: 2rem;
+  }
+  
+  #roadmap > div:first-child {
+    font-size: 2rem;
+    font-family: SGB;
+    margin-bottom: 2rem;
+  }
+  
+  #roadmap > div {
+    font-size: 1.4rem;
+    font-family: SGM;
+  }
+  
+  #roadmap > p {
+    font-family: SGL;
+    font-size: 1.2rem;
+  }
+  
+  /*Content wide-screen styling*/
+  @media (min-width: 1200px) {  
+    #rules-header {
+        font-size: 3rem;
+        padding: 2rem;
+    }
+
+    #initial {
+      padding: 6rem 12rem;
+    }
+  
+    #flow,
+    #example,
+    #roadmap {
+      padding: 6rem 12rem;
+    }
+  
+    #initial > div,
+    #flow > div {
+      font-size: 2.2rem;
+      margin-bottom: 2rem;
+    }
+  
+  
+    li > div:first-child {
+      font-size: 1.6rem;
+    }
+  
+    li > div:last-child {
+      font-size: 1.4rem;
+    }
+  
+    #example > div {
+      font-size: 2.2rem;
+      margin-bottom: 2rem;
+    }
+  
+    #example > p {
+      font-size: 1.4rem;
+      min-width: 60rem;
+    }
+  
+    #roadmap > div:first-child {
+      font-size: 3.5rem;
+    }
+  
+    #roadmap > div {
+      font-size: 1.8rem;
+    }
+  
+    #roadmap > p {
+      font-size: 1.6rem;
+    }
+  }
+  
+  /*Content mobile styling*/
+  @media (max-width: 1200px) {
+    #video-box {
+      height: calc(100vh + 3rem);
+      width: 100%;
+    }
+  
+    video {
+      width: auto;
+    }
+  
+    #text-over-video {
+      font-size: 2rem;
+      top: 40%;
+    }
+  
+    #text-over-video > a {
+      padding: 1rem 2rem;
+      font-size: 1.4rem;
+    }
+  
+    #roadmap {
+      padding-bottom: 5rem;
+    }
+  }
+  

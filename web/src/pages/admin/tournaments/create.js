@@ -13,7 +13,7 @@ export default function Create({ socket, username, isAdmin, changeUrl }) {
     const [description, setDescription] = useState('');
     const [prizeAndDistribution, setPrizeAndDistribution] = useState('');
     const [optionalLink, setOptionalLink] = useState('');
-    const [isCreating, setIsCreating] = useState(true);
+    const [isCreating, setIsCreating] = useState(false);
 
     function handleChanges(e) {
         switch (e.target.name) {
@@ -54,10 +54,12 @@ export default function Create({ socket, username, isAdmin, changeUrl }) {
 
     async function createTournament(e) {
         e.preventDefault();
+        setIsCreating(true);
         const result = await CreateTournament(socket, name, description, rules, tournamentType, prizeAndDistribution, timePerMove, timeBetweenRounds, maxParticipants, optionalLink, dateTime);
         if (result !== null) {
             if (result) {
                 changeUrl('/admin/tournaments/upcoming');
+                setIsCreating(false);
             }
         }
         else {
@@ -197,7 +199,7 @@ export default function Create({ socket, username, isAdmin, changeUrl }) {
                                 value={optionalLink} onChange={handleChanges} />
                         </label>
                         <div className="flex items-center justify-end mt-4">
-                            {isCreating ?
+                            {!isCreating ?
                                 <button type="submit"
                                     className="px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
                                     <li className="fas fa-trophy mr-2"></li>

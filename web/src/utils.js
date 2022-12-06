@@ -4,22 +4,24 @@ const API_URL = 'https://magic-marble-api.herokuapp.com';
 const WEB_URL = 'https://squid-app-mtjl8.ondigitalocean.app';
 
 const GetUser = async (socket) => {
-    const token = JSON.parse(localStorage.getItem('token'));
-    if (token) {
-        // get user info
-        if (socket) {
-            const response = await fetch(`${API_URL}/getuser`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                    'SocketId': socket.id
-                }
-            });
+    if (socket.id) {
+        const token = JSON.parse(localStorage.getItem('token'));
+        if (token) {
+            // get user info
+            if (socket) {
+                const response = await fetch(`${API_URL}/getuser`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'SocketId': socket.id
+                    }
+                });
 
-            const data = await response.json();
-            if (!data.error) {
-                return data.user;
+                const data = await response.json();
+                if (!data.error) {
+                    return data.user;
+                }
             }
         }
     }

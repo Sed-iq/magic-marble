@@ -144,7 +144,7 @@ export default function Wallet({ socket, username, isAdmin, changeUrl }) {
                             <p className="text-gray-400 text-center my-2 mt-4">
                                 asfaskjlhakjfhalkfbakfhsakjfhakfhsafhsafa
                                 <button className='text-purple-500 ml-2'>
-                                    <i class="fa-regular fa-copy"></i>
+                                    <i className="fa-regular fa-copy"></i>
                                 </button>
                             </p>
                             <div className='text-center'>

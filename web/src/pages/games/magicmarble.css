@@ -932,17 +932,15 @@ body {
   left: 50%;
   border-radius: 10px;
   transform: translate(-50%, -50%);
-  background-color: #0e1232;
+  background-color: rgb(166 166 166 / 0.3);
   color: white;
   font: bold;
-  font-size: 32px;
   min-width: 20rem;
   min-height: 5rem;
   text-align: center;
   display: flex;
   align-items: center;
   place-content: center;
-  padding: 5px 10px;
 }
 
 .animate-bot-to-bot {

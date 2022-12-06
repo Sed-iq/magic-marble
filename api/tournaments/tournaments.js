@@ -353,7 +353,7 @@ const addBet = async (data) => {
                     currentTournaments[index].currentPlayers[matchWithPlayerIdx] = playerTwo;
 
                     // updating player records
-                    messageToAllSockets(data.tournamentId, "winRound", { roundWinner: roundWinner, wonAmount: wonAmount , tournament: currentTournaments[index] });
+                    messageToAllSockets(data.tournamentId, "winRound", { roundWinner: roundWinner, wonAmount: wonAmount , tournamentId: currentTournaments[index].id });
 
                     if (playerOne.score > 0 && playerTwo.score > 0) {
                         // Changing Roles
@@ -433,7 +433,8 @@ const addMessage = async (data) => {
                 currentTournaments[index].currentPlayers[matchWithPlayerIdx] = playerTwo;
 
                 // updating player records
-                messageToAllSockets(data.tournamentId, "message", { by: playerOne.username, to: playerTwo.username, message: data.message, tournament: currentTournaments[index] });
+                messageToAllSockets(data.tournamentId, "message", { by: playerOne.username, to: playerTwo.username, message: data.message, tournamentId: currentTournaments[index].id });
+                messageToAllSockets(data.tournamentId, "update", { tournament: currentTournaments[index] });
             }
         }
     }
@@ -471,7 +472,7 @@ const CheckTournamentStatus = (tournamentId) => {
                             }
                             currentTournaments[index].isStarted = false;
                             await setTournamentCompleted(tournamentId, currentTournaments[index].currentPlayers[0].userId);
-                            messageToAllSockets(tournamentId, "endTournament", { tournament: currentTournaments[index] });
+                            messageToAPlayer(tournamentId, currentTournaments[index].currentPlayers[0].userId, "endTournament", { tournamentId: currentTournaments[index].id });
                             currentTournaments = currentTournaments.filter(t => t.id !== tournamentId);
                         }
                         if (length === 2 || length === 4 || length === 8 || length === 16 || length === 32 || length === 64 || length === 128 || length === 256 || length === 512) {

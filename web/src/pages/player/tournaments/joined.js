@@ -3,7 +3,7 @@ import Loading from '../../../components/Loading';
 
 import { GetUser, PlayerGetAllTournaments, LeaveTournament } from '../../../utils';
 
-export default function Joined(socket, username, isAdmin, changeUrl) {
+export default function Joined({socket, username, isAdmin, changeUrl}) {
     const [isLoading, setIsLoading] = useState(true);
     const [tournaments, setTournaments] = useState([]);
 

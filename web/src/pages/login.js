@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { GetUser, LoginUser } from '../utils';
 
-export default function Login({socket}) {
+export default function Login({ socketId }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
@@ -35,13 +35,15 @@ export default function Login({socket}) {
     }
 
     async function loadUser() {
-        const user = await GetUser(socket);
-        if (user) {
-            if (user.isAdmin) {
-                navigate('/admin/dashboard');
-            }
-            if (!user.isAdmin) {
-                navigate('/player/dashboard');
+        if (socketId) {
+            const user = await GetUser(socketId);
+            if (user) {
+                if (user.isAdmin) {
+                    navigate('/admin/dashboard');
+                }
+                if (!user.isAdmin) {
+                    navigate('/player/dashboard');
+                }
             }
         }
     }
@@ -51,7 +53,7 @@ export default function Login({socket}) {
             await loadUser();
         }
         asyncFunc();
-    },[socket]);
+    }, [socketId]);
 
     return (
         <div className="flex items-center min-h-screen p-6 bg-gray-900">

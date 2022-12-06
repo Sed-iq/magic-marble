@@ -3,7 +3,7 @@ import Loading from '../../../components/Loading';
 
 import { GetUser, PlayerGetAllTournaments, JoinTournament } from '../../../utils';
 
-export default function All({ socket, username, isAdmin, changeUrl }) {
+export default function All({ socketId, username, isAdmin, changeUrl }) {
     const [popupAllowed, setPopupAllowed] = useState('');
     const [isLoading01, setIsLoading01] = useState(true);
     const [isLoading02, setIsLoading02] = useState(true);
@@ -11,7 +11,7 @@ export default function All({ socket, username, isAdmin, changeUrl }) {
     const [liveTournaments, setLiveTournaments] = useState([]);
 
     async function joinTournament(tournamentId) {
-        const result = await JoinTournament(socket, tournamentId);
+        const result = await JoinTournament(socketId, tournamentId);
         if (result !== null) {
             if (result) {
                 changeUrl(`/player/tournaments/joined`);
@@ -77,7 +77,7 @@ export default function All({ socket, username, isAdmin, changeUrl }) {
     }
 
     async function loadTournaments(status) {
-        const result = await PlayerGetAllTournaments(socket, status, 'getTournamentsForPlayer')
+        const result = await PlayerGetAllTournaments(socketId, status, 'getTournamentsForPlayer')
         if (result) {
             if (status === 'upcoming') {
                 setUpcomingTournaments(result);
@@ -94,13 +94,15 @@ export default function All({ socket, username, isAdmin, changeUrl }) {
         setIsLoading01(true);
         setIsLoading02(true);
         const asyncFunc = async () => {
-            const user = await GetUser(socket);
-            if (!user || user.isAdmin) {
-                changeUrl('/login');
-            }
-            else {
-                loadTournaments('upcoming');
-                loadTournaments('live');
+            if (socketId) {
+                const user = await GetUser(socketId);
+                if (!user || user.isAdmin) {
+                    changeUrl('/login');
+                }
+                else {
+                    loadTournaments('upcoming');
+                    loadTournaments('live');
+                }
             }
         }
         let tempWindow = window.open('', 'tempWindow', 'toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,directories=no,status=no');
@@ -112,7 +114,7 @@ export default function All({ socket, username, isAdmin, changeUrl }) {
             tempWindow.close();
             setPopupAllowed('Yes');
         }
-    }, [socket]);
+    }, [socketId]);
 
     return (
         <main className="h-full overflow-y-auto">

@@ -3,12 +3,12 @@ import Loading from '../../../components/Loading';
 
 import { GetUser, PlayerGetAllTournaments, LeaveTournament } from '../../../utils';
 
-export default function Joined({socket, username, isAdmin, changeUrl}) {
+export default function Joined({ socketId, username, isAdmin, changeUrl }) {
     const [isLoading, setIsLoading] = useState(true);
     const [tournaments, setTournaments] = useState([]);
 
     async function leaveTournament(tournamentId) {
-        const result = await LeaveTournament(socket, tournamentId);
+        const result = await LeaveTournament(socketId, tournamentId);
         if (result !== null) {
             if (result) {
                 loadTournaments();
@@ -20,7 +20,7 @@ export default function Joined({socket, username, isAdmin, changeUrl}) {
     }
 
     async function loadTournaments() {
-        const result = await PlayerGetAllTournaments(socket, 'upcoming', 'getPlayerTournaments')
+        const result = await PlayerGetAllTournaments(socketId, 'upcoming', 'getPlayerTournaments')
         if (result) {
             setTournaments(result);
             setIsLoading(false);
@@ -30,16 +30,18 @@ export default function Joined({socket, username, isAdmin, changeUrl}) {
     useEffect(() => {
         setIsLoading(true);
         const asyncFunc = async () => {
-            const user = await GetUser(socket);
-            if (!user || user.isAdmin) {
-                changeUrl('/login');
-            }
-            else {
-                loadTournaments();
+            if (socketId) {
+                const user = await GetUser(socketId);
+                if (!user || user.isAdmin) {
+                    changeUrl('/login');
+                }
+                else {
+                    loadTournaments();
+                }
             }
         }
         asyncFunc();
-    }, [socket]);
+    }, [socketId]);
 
     return (
         <main className="h-full overflow-y-auto">

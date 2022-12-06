@@ -3,12 +3,12 @@ import Loading from '../../../components/Loading';
 
 import { GetUser, AdminGetAllTournaments } from '../../../utils';
 
-export default function Completed({ socket, username, isAdmin, changeUrl }) {
+export default function Completed({ socketId, username, isAdmin, changeUrl }) {
     const [isLoading, setIsLoading] = useState(true);
     const [tournaments, setTournaments] = useState([]);
 
     async function loadTournaments() {
-        const result = await AdminGetAllTournaments(socket, 'completed')
+        const result = await AdminGetAllTournaments(socketId, 'completed')
         if (result) {
             setTournaments(result);
             setIsLoading(false);
@@ -18,16 +18,18 @@ export default function Completed({ socket, username, isAdmin, changeUrl }) {
     useEffect(() => {
         setIsLoading(true);
         const asyncFunc = async () => {
-            const user = await GetUser(socket);
-            if (!user || !user.isAdmin) {
-                changeUrl('/login');
-            }
-            else {
-                loadTournaments();
+            if (socketId) {
+                const user = await GetUser(socketId);
+                if (!user || !user.isAdmin) {
+                    changeUrl('/login');
+                }
+                else {
+                    loadTournaments();
+                }
             }
         }
         asyncFunc();
-    }, [socket]);
+    }, [socketId]);
 
     return (
         <main className="h-full overflow-y-auto">

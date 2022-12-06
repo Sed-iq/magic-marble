@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser, CreateTournament } from '../../../utils';
 
-export default function Create({ socket, username, isAdmin, changeUrl }) {
+export default function Create({ socketId, username, isAdmin, changeUrl }) {
     const [name, setName] = useState('');
     const [rules, setRules] = useState("Guesser determines the wager amount");
     const [tournamentType, setTournamentType] = useState("Single Elimination");
@@ -55,7 +55,7 @@ export default function Create({ socket, username, isAdmin, changeUrl }) {
     async function createTournament(e) {
         e.preventDefault();
         setIsCreating(true);
-        const result = await CreateTournament(socket, name, description, rules, tournamentType, prizeAndDistribution, timePerMove, timeBetweenRounds, maxParticipants, optionalLink, dateTime);
+        const result = await CreateTournament(socketId, name, description, rules, tournamentType, prizeAndDistribution, timePerMove, timeBetweenRounds, maxParticipants, optionalLink, dateTime);
         if (result !== null) {
             if (result) {
                 changeUrl('/admin/tournaments/upcoming');
@@ -69,13 +69,15 @@ export default function Create({ socket, username, isAdmin, changeUrl }) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(socket);
-            if (!user || !user.isAdmin) {
-                changeUrl('/login');
+            if (socketId) {
+                const user = await GetUser(socketId);
+                if (!user || !user.isAdmin) {
+                    changeUrl('/login');
+                }
             }
         }
         asyncFunc();
-    }, [socket]);
+    }, [socketId]);
 
     return (
         <main className="h-full overflow-y-auto">

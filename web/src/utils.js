@@ -1,20 +1,21 @@
-// const API_URL = 'http://localhost:5500';
-const API_URL = 'https://magic-marble-api.herokuapp.com';
-// const WEB_URL = 'http://localhost:3000';
-const WEB_URL = 'https://squid-app-mtjl8.ondigitalocean.app';
+const API_URL = 'http://localhost:5500';
+// const API_URL = 'https://magic-marble-api.herokuapp.com';
+const WEB_URL = 'http://localhost:3000';
+// const WEB_URL = 'https://squid-app-mtjl8.ondigitalocean.app';
 
-const GetUser = async (socket) => {
-    if (socket.id) {
+const GetUser = async (socketId) => {
+    console.log(socketId);
+    if (socketId) {
         const token = JSON.parse(localStorage.getItem('token'));
         if (token) {
             // get user info
-            if (socket) {
+            if (socketId) {
                 const response = await fetch(`${API_URL}/getuser`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`,
-                        'SocketId': socket.id
+                        'SocketId': socketId
                     }
                 });
 
@@ -82,8 +83,8 @@ const LoginUser = async (username, password) => {
     }
 }
 
-const UpdateUser = async (socket, username) => {
-    const user = await GetUser(socket);
+const UpdateUser = async (socketId, username) => {
+    const user = await GetUser(socketId);
     if (user) {
         if (user.username !== username) {
             if (username.length > 0) {
@@ -123,9 +124,9 @@ const UpdateUser = async (socket, username) => {
     }
 }
 
-const DeleteUser = async (socket) => {
+const DeleteUser = async (socketId) => {
     if (window.confirm("Are you sure to delete your account?")) {
-        const user = await GetUser(socket);
+        const user = await GetUser(socketId);
         if (user) {
             const response = await fetch(`${API_URL}/deleteUser`, {
                 method: 'POST',
@@ -153,8 +154,8 @@ const DeleteUser = async (socket) => {
     }
 }
 
-const CreateTournament = async (socket, name, description, rules, tournamentType, prizeAndDistribution, timePerMove, timeBetweenRounds, maxParticipants, optionalLink, dateTime) => {
-    const user = await GetUser(socket);
+const CreateTournament = async (socketId, name, description, rules, tournamentType, prizeAndDistribution, timePerMove, timeBetweenRounds, maxParticipants, optionalLink, dateTime) => {
+    const user = await GetUser(socketId);
     if (user) {
         if (user.isAdmin) {
             if (name.length > 0 && description.length > 0 && rules.length > 0 && prizeAndDistribution.length > 0 && timePerMove.length > 0 && timeBetweenRounds.length > 0 && maxParticipants.length > 0 && dateTime.length > 0) {
@@ -208,8 +209,8 @@ const CreateTournament = async (socket, name, description, rules, tournamentType
     }
 }
 
-const UpdateTournament = async (socket, tournamentId, name, description, rules, tournamentType, prizeAndDistribution, timePerMove, timeBetweenRounds, maxParticipants, dateTime, optionalLink) => {
-    const user = await GetUser(socket);
+const UpdateTournament = async (socketId, tournamentId, name, description, rules, tournamentType, prizeAndDistribution, timePerMove, timeBetweenRounds, maxParticipants, dateTime, optionalLink) => {
+    const user = await GetUser(socketId);
     if (user) {
         if (user.isAdmin) {
             if (name.length > 0 && description.length > 0 && rules.length > 0 && prizeAndDistribution.length > 0 && timePerMove.length > 0 && timeBetweenRounds.length > 0 && maxParticipants.length > 0 && dateTime.length > 0) {
@@ -264,8 +265,8 @@ const UpdateTournament = async (socket, tournamentId, name, description, rules, 
     }
 }
 
-const DeleteTournament = async (socket, tournamentId) => {
-    const user = await GetUser(socket);
+const DeleteTournament = async (socketId, tournamentId) => {
+    const user = await GetUser(socketId);
     if (user) {
         if (user.isAdmin) {
             if (window.confirm('Are you sure to delete this tournament?')) {
@@ -300,8 +301,8 @@ const DeleteTournament = async (socket, tournamentId) => {
     }
 }
 
-const GetATournament = async (socket, tournamentId) => {
-    const user = await GetUser(socket);
+const GetATournament = async (socketId, tournamentId) => {
+    const user = await GetUser(socketId);
     if (user) {
         const response = await fetch(`${API_URL}/getTournament/?userId=${user.id}&tournamentId=${tournamentId}`, {
             method: 'GET',
@@ -323,8 +324,8 @@ const GetATournament = async (socket, tournamentId) => {
     }
 }
 
-const AdminGetAllTournaments = async (socket, status) => {
-    const user = await GetUser(socket);
+const AdminGetAllTournaments = async (socketId, status) => {
+    const user = await GetUser(socketId);
     if (user) {
         if (user.isAdmin) {
             const response = await fetch(`${API_URL}/getAllTournaments/?userId=${user.id}&status=${status}`, {
@@ -352,8 +353,8 @@ const AdminGetAllTournaments = async (socket, status) => {
     }
 }
 
-const PlayerGetAllTournaments = async (socket, status, purpose) => {
-    const user = await GetUser(socket);
+const PlayerGetAllTournaments = async (socketId, status, purpose) => {
+    const user = await GetUser(socketId);
     if (user) {
         if (!user.isAdmin) {
             const response = await fetch(`${API_URL}/${purpose}/?userId=${user.id}&status=${status}`, {
@@ -381,9 +382,9 @@ const PlayerGetAllTournaments = async (socket, status, purpose) => {
     }
 }
 
-const JoinTournament = async (socket, id) => {
+const JoinTournament = async (socketId, id) => {
     if (window.confirm("Are you sure to join this tournament?")) {
-        const user = await GetUser(socket);
+        const user = await GetUser(socketId);
         if (user) {
             const response = await fetch(`${API_URL}/joinTournament`, {
                 method: 'POST',
@@ -412,9 +413,9 @@ const JoinTournament = async (socket, id) => {
     }
 }
 
-const LeaveTournament = async (socket, id) => {
+const LeaveTournament = async (socketId, id) => {
     if (window.confirm("Are you sure you want to leave this tournament?")) {
-        const user = await GetUser(socket);
+        const user = await GetUser(socketId);
         if (user) {
             const response = await fetch(`${API_URL}/leaveTournament`, {
                 method: 'POST',
@@ -443,8 +444,8 @@ const LeaveTournament = async (socket, id) => {
     }
 }
 
-const GetAllPlayers = async (socket) => {
-    const user = await GetUser(socket);
+const GetAllPlayers = async (socketId) => {
+    const user = await GetUser(socketId);
     if (user) {
         if (user.isAdmin) {
             const response = await fetch(`${API_URL}/getAllPlayers/?userId=${user.id}`, {
@@ -472,8 +473,8 @@ const GetAllPlayers = async (socket) => {
     }
 }
 
-const GetAdminDashboardData = async (socket) => {
-    const user = await GetUser(socket);
+const GetAdminDashboardData = async (socketId) => {
+    const user = await GetUser(socketId);
     if (user) {
         if (user.isAdmin) {
             const response = await fetch(`${API_URL}/getAdminDashboardData/?userId=${user.id}`, {
@@ -501,8 +502,8 @@ const GetAdminDashboardData = async (socket) => {
     }
 }
 
-const GetPlayerDashboardData = async (socket) => {
-    const user = await GetUser(socket);
+const GetPlayerDashboardData = async (socketId) => {
+    const user = await GetUser(socketId);
     if (user) {
         if (!user.isAdmin) {
             const response = await fetch(`${API_URL}/getPlayerDashboardData/?userId=${user.id}`, {

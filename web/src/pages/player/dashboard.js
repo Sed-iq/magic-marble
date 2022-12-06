@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser, GetPlayerDashboardData } from '../../utils';
 
-export default function Dashboard({ socket, username, isAdmin, changeUrl }) {
+export default function Dashboard({ socketId, username, isAdmin, changeUrl }) {
     const [playedTournaments, setPlayedTournaments] = useState(0);
     const [wonTournaments, setWonTournaments] = useState(0);
     const [joinedTournaments, setJoinedTournaments] = useState(0);
     const [liveTournaments, setLiveTournaments] = useState(0);
 
     async function loadData() {
-        const result = await GetPlayerDashboardData(socket);
+        const result = await GetPlayerDashboardData(socketId);
         if (result !== null) {
             if (result) {
                 setPlayedTournaments(result.playedTournaments);
@@ -25,16 +25,19 @@ export default function Dashboard({ socket, username, isAdmin, changeUrl }) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(socket);
-            if (!user || user.isAdmin) {
-                changeUrl('/login');
-            }
-            else {
-                loadData();
+            if (socketId) {
+                const user = await GetUser(socketId);
+                if (!user || user.isAdmin) {
+                    console.log('not logged in');
+                    changeUrl('/login');
+                }
+                else {
+                    loadData();
+                }
             }
         }
         asyncFunc();
-    }, [socket]);
+    }, [socketId]);
 
     return (
         <main className="h-full overflow-y-auto">

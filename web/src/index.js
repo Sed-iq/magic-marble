@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useFetcher } from "react-router-dom";
 
 import { API_URL, WEB_URL } from './utils';
 
@@ -23,42 +23,53 @@ let socket = io(API_URL, {
   transports: ['websocket']
 });
 
-// call when user connect to socket
-socket.on('connect', () => {
-  console.log('Connected to server');
-});
+function App() {
+  const [socketId, setSocketId] = useState(null);
 
-// notify when tournaemnt is started for opening tab
-socket.on("notify", (data) => {
-  if (window.open(`${WEB_URL}/games/magicmarble?id=${data.tournamentId}`, '_blank')) {
-    window.focus();
-  }
-  else {
-    alert(`Windows blocked to open new tab. Link is: ${WEB_URL}/games/magicmarble?id=${data.tournamentId}`);
-    localStorage.setItem("allowPopup", false);
-  }
-});
+  useEffect(() => {
+    // call when user connect to socket
+    socket.on('connect', () => {
+      console.log('Connected to server');
+      setSocketId(socket.id);
+    });
 
-// disconnect socket when user close the tab or browser or refresh the page
-socket.on('disconnect', () => {
-  socket = null;
-  console.log('Disconnected from server');
-});
+    // notify when tournaemnt is started for opening tab
+    socket.on("notify", (data) => {
+      if (window.open(`${WEB_URL}/games/magicmarble?id=${data.tournamentId}`, '_blank')) {
+        window.focus();
+      }
+      else {
+        alert(`Windows blocked to open new tab. Link is: ${WEB_URL}/games/magicmarble?id=${data.tournamentId}`);
+        localStorage.setItem("allowPopup", false);
+      }
+    });
+
+    // disconnect socket when user close the tab or browser or refresh the page
+    socket.on('disconnect', () => {
+      setSocketId(null);
+      console.log('Disconnected from server');
+    });
+  }, []);
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home socketId={socketId} />} />
+        <Route path="/login" element={<Login socketId={socketId} />} />
+        <Route path="/register" element={<Register socketId={socketId} />} />
+        <Route path="/admin/*" element={<Admin socketId={socketId} />} />
+        <Route path="/player/*" element={<Player socketId={socketId} />} />
+        <Route path="/games/magicmarble" element={<MagicMarble socketId={socketId} socket={socket} />} />
+        <Route path="*" element={<Error />} />
+      </Routes>
+    </BrowserRouter >
+  )
+}
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home socket={socket} />} />
-        <Route path="/login" element={<Login socket={socket} />} />
-        <Route path="/register" element={<Register socket={socket} />} />
-        <Route path="/admin/*" element={<Admin socket={socket} />} />
-        <Route path="/player/*" element={<Player socket={socket} />} />
-        <Route path="/games/magicmarble" element={<MagicMarble socket={socket} />} />
-        <Route path="*" element={<Error />} />
-      </Routes>
-    </BrowserRouter>
+    <App />
   </React.StrictMode>,
 );

@@ -220,7 +220,7 @@ function TopBar({ counterText, language, setLanguage }) {
 }
 
 
-export default function MagicMarble({ socket }) {
+export default function MagicMarble({ socketId, socket }) {
     const [userId, setUserId] = useState(null);
     const [tournamentId, setTournamentId] = useState(null);
     const [playerOne, setPlayerOne] = useState({
@@ -471,30 +471,32 @@ export default function MagicMarble({ socket }) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(socket);
-            if (!user || user.isAdmin) {
-                changeUrl('/login');
-            }
-            else {
-                setUserId(user.id);
-                // getting tournamentId from url
-                if (window.location.href.split('?')[1]) {
-                    let id = window.location.href.split('?')[1].split('=')[1];
-                    if (id) {
-                        setTournamentId(id);
+            if (socketId) {
+                const user = await GetUser(socketId);
+                if (!user || user.isAdmin) {
+                    changeUrl('/login');
+                }
+                else {
+                    setUserId(user.id);
+                    // getting tournamentId from url
+                    if (window.location.href.split('?')[1]) {
+                        let id = window.location.href.split('?')[1].split('=')[1];
+                        if (id) {
+                            setTournamentId(id);
+                        }
+                        else {
+                            changeUrl('/player/dashboard');
+                        }
                     }
                     else {
                         changeUrl('/player/dashboard');
                     }
                 }
-                else {
-                    changeUrl('/player/dashboard');
-                }
             }
         }
         // setupFuns();
         asyncFunc();
-    }, [socket]);
+    }, [socketId]);
 
     useEffect(() => {
         if (tournamentId && userId) {

@@ -3,13 +3,13 @@ import Loading from '../../components/Loading';
 
 import { GetUser, GetAllPlayers } from '../../utils';
 
-export default function Players({ socket, username, isAdmin, changeUrl }) {
+export default function Players({ socketId, username, isAdmin, changeUrl }) {
     const [isLoading, setIsLoading] = useState(true);
 
     const [players, setPlayers] = useState([]);
 
     async function loadPlayers() {
-        const result = await GetAllPlayers(socket);
+        const result = await GetAllPlayers(socketId);
         if (result !== null) {
             if (result) {
                 setPlayers(result);
@@ -24,16 +24,18 @@ export default function Players({ socket, username, isAdmin, changeUrl }) {
     useEffect(() => {
         setIsLoading(true);
         const asyncFunc = async () => {
-            const user = await GetUser(socket);
-            if (!user || !user.isAdmin) {
-                changeUrl('/login');
-            }
-            else {
-                loadPlayers();
+            if (socketId) {
+                const user = await GetUser(socketId);
+                if (!user || !user.isAdmin) {
+                    changeUrl('/login');
+                }
+                else {
+                    loadPlayers();
+                }
             }
         }
         asyncFunc();
-    }, [socket]);
+    }, [socketId]);
 
     return (
         <main className="h-full overflow-y-auto">

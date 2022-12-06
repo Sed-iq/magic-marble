@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser, GetATournament, UpdateTournament } from '../../../utils';
 
-export default function View({socket, username, isAdmin, changeUrl}) {
+export default function View({ socketId, username, isAdmin, changeUrl }) {
     const [tournamentId, setTournamentId] = useState(null);
     const [name, setName] = useState('');
     const [rules, setRules] = useState("Guesser determines the wager amount");
@@ -54,7 +54,7 @@ export default function View({socket, username, isAdmin, changeUrl}) {
 
     async function updateTournament(e) {
         e.preventDefault();
-        const result = await UpdateTournament(socket, tournamentId, name, description, rules, tournamentType, prizeAndDistribution, timePerMove, timeBetweenRounds, maxParticipants, dateTime, optionalLink);
+        const result = await UpdateTournament(socketId, tournamentId, name, description, rules, tournamentType, prizeAndDistribution, timePerMove, timeBetweenRounds, maxParticipants, dateTime, optionalLink);
         if (result !== null) {
             if (result) {
                 changeUrl('/admin/tournaments/upcoming');
@@ -66,7 +66,7 @@ export default function View({socket, username, isAdmin, changeUrl}) {
     }
 
     async function loadTournament(tournamentId) {
-        const result = await GetATournament(socket, tournamentId);
+        const result = await GetATournament(socketId, tournamentId);
         if (result) {
             const tournament = result;
             setName(tournament.name.toString());
@@ -107,16 +107,26 @@ export default function View({socket, username, isAdmin, changeUrl}) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(socket);
-            if (!user || !user.isAdmin) {
-                changeUrl('/login');
-            }
-            else {
-                if (window.location.href.split('?')[1]) {
-                    let tournamentId = window.location.href.split('?')[1].split('=')[1];
-                    if (tournamentId) {
-                        setTournamentId(tournamentId);
-                        loadTournament(tournamentId);
+            if (socketId) {
+                const user = await GetUser(socketId);
+                if (!user || !user.isAdmin) {
+                    changeUrl('/login');
+                }
+                else {
+                    if (window.location.href.split('?')[1]) {
+                        let tournamentId = window.location.href.split('?')[1].split('=')[1];
+                        if (tournamentId) {
+                            setTournamentId(tournamentId);
+                            loadTournament(tournamentId);
+                        }
+                        else {
+                            if (isAdmin) {
+                                changeUrl('/admin/dashboard');
+                            }
+                            else {
+                                changeUrl('/player/dashboard');
+                            }
+                        }
                     }
                     else {
                         if (isAdmin) {
@@ -127,18 +137,10 @@ export default function View({socket, username, isAdmin, changeUrl}) {
                         }
                     }
                 }
-                else {
-                    if (isAdmin) {
-                        changeUrl('/admin/dashboard');
-                    }
-                    else {
-                        changeUrl('/player/dashboard');
-                    }
-                }
             }
         }
         asyncFunc();
-    },[socket]);
+    }, [socketId]);
 
     return (
         <main className="h-full overflow-y-auto">

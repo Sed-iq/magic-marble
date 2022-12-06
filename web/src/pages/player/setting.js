@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser, UpdateUser, DeleteUser } from '../../utils';
 
-export default function Setting({ socket, username, isAdmin, setUsername, changeUrl }) {
+export default function Setting({ socketId, username, isAdmin, setUsername, changeUrl }) {
     const [tempUsername, setTempUsername] = useState(username);
 
     async function updateUser() {
-        const result = await UpdateUser(socket, tempUsername);
+        const result = await UpdateUser(socketId, tempUsername);
         if (result !== null) {
             if (result) {
                 setUsername(tempUsername);
@@ -19,7 +19,7 @@ export default function Setting({ socket, username, isAdmin, setUsername, change
     }
 
     async function deleteUser() {
-        const result = await DeleteUser(socket);
+        const result = await DeleteUser(socketId);
         if (result !== null) {
             if (result) {
                 changeUrl('/login');
@@ -32,13 +32,15 @@ export default function Setting({ socket, username, isAdmin, setUsername, change
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(socket);
-            if (!user || user.isAdmin !== isAdmin) {
-                changeUrl('/login');
+            if (socketId) {
+                const user = await GetUser(socketId);
+                if (!user || user.isAdmin !== isAdmin) {
+                    changeUrl('/login');
+                }
             }
         }
         asyncFunc();
-    }, [socket]);
+    }, [socketId]);
 
     return (
         <main className="h-full overflow-y-auto">

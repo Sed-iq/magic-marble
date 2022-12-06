@@ -3,12 +3,12 @@ import Loading from '../../../components/Loading';
 
 import { GetUser, AdminGetAllTournaments, DeleteTournament } from '../../../utils';
 
-export default function Upcoming({socket, username, isAdmin, changeUrl}) {
+export default function Upcoming({ socketId, username, isAdmin, changeUrl }) {
     const [isLoading, setIsLoading] = useState(true);
     const [tournaments, setTournaments] = useState([]);
 
     async function deleteTournament(tournamentId) {
-        const result = await DeleteTournament(socket, tournamentId);
+        const result = await DeleteTournament(socketId, tournamentId);
         if (result !== null) {
             if (result) {
                 loadTournaments();
@@ -20,7 +20,7 @@ export default function Upcoming({socket, username, isAdmin, changeUrl}) {
     }
 
     async function loadTournaments() {
-        const result = await AdminGetAllTournaments(socket, 'upcoming')
+        const result = await AdminGetAllTournaments(socketId, 'upcoming')
         if (result) {
             setTournaments(result);
             setIsLoading(false);
@@ -30,16 +30,18 @@ export default function Upcoming({socket, username, isAdmin, changeUrl}) {
     useEffect(() => {
         setIsLoading(true);
         const asyncFunc = async () => {
-            const user = await GetUser(socket);
-            if (!user || !user.isAdmin) {
-                changeUrl('/login');
-            }
-            else {
-                loadTournaments();
+            if (socketId) {
+                const user = await GetUser(socketId);
+                if (!user || !user.isAdmin) {
+                    changeUrl('/login');
+                }
+                else {
+                    loadTournaments();
+                }
             }
         }
         asyncFunc();
-    },[socket]);
+    }, [socketId]);
 
     return (
         <main className="h-full overflow-y-auto">

@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser, GetATournament } from '../../../utils';
 
-export default function View({ socket, username, isAdmin, changeUrl }) {
+export default function View({ socketId, username, isAdmin, changeUrl }) {
     const [tournament, setTournament] = useState({});
 
-    async function loadTournament(userId, tournamentId) {
-        const result = await GetATournament(socket, tournamentId);
+    async function loadTournament(tournamentId) {
+        const result = await GetATournament(socketId, tournamentId);
         if (result) {
             setTournament(result);
         }
@@ -14,28 +14,20 @@ export default function View({ socket, username, isAdmin, changeUrl }) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(socket);
-            if (!user || user.isAdmin === true) {
-                changeUrl('/login');
-            }
-            else {
-                if (window.location.href.split('?')[1]) {
-                    let tournamentId = window.location.href.split('?')[1].split('=')[1];
-                    if (tournamentId) {
-                        loadTournament(user.id, tournamentId);
-                    }
-                    else {
-                        if (isAdmin) {
-                            changeUrl('/admin/dashboard');
+            if (socketId) {
+                const user = await GetUser(socketId);
+                if (!user || user.isAdmin === true) {
+                    changeUrl('/login');
+                }
+                else {
+                    if (window.location.href.split('?')[1]) {
+                        let tournamentId = window.location.href.split('?')[1].split('=')[1];
+                        if (tournamentId) {
+                            loadTournament(tournamentId);
                         }
                         else {
                             changeUrl('/player/dashboard');
                         }
-                    }
-                }
-                else {
-                    if (isAdmin) {
-                        changeUrl('/admin/dashboard');
                     }
                     else {
                         changeUrl('/player/dashboard');
@@ -44,7 +36,7 @@ export default function View({ socket, username, isAdmin, changeUrl }) {
             }
         }
         asyncFunc();
-    }, [socket]);
+    }, [socketId]);
 
     return (
         <main className="h-full overflow-y-auto">

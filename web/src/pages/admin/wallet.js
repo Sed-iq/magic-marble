@@ -2,16 +2,18 @@ import React, { useEffect } from 'react';
 
 import { GetUser } from '../../utils';
 
-export default function Wallet({ socket, username, isAdmin, changeUrl }) {
+export default function Wallet({ socketId, username, isAdmin, changeUrl }) {
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(socket);
-            if (!user || user.isAdmin === false) {
-                changeUrl('/login');
+            if (socketId) {
+                const user = await GetUser(socketId);
+                if (!user || user.isAdmin === false) {
+                    changeUrl('/login');
+                }
             }
         }
         asyncFunc();
-    }, [socket]);
+    }, [socketId]);
 
     return (
         <main className="h-full overflow-y-auto">

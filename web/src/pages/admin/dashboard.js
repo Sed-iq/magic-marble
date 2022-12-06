@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-import { GetUser,GetAdminDashboardData } from '../../utils';
+import { GetUser, GetAdminDashboardData } from '../../utils';
 
-export default function Dashboard({ socket, username, isAdmin, changeUrl }) {
+export default function Dashboard({ socketId, username, isAdmin, changeUrl }) {
     const [totalPlayers, setTotalPlayers] = useState(0);
     const [upcomingTournaments, setUpcomingTournaments] = useState(0);
     const [liveTournaments, setLiveTournaments] = useState(0);
@@ -10,7 +10,7 @@ export default function Dashboard({ socket, username, isAdmin, changeUrl }) {
 
 
     async function loadData() {
-        const result = await GetAdminDashboardData(socket);
+        const result = await GetAdminDashboardData(socketId);
         if (result !== null) {
             if (result) {
                 setTotalPlayers(result.totalPlayers);
@@ -26,16 +26,18 @@ export default function Dashboard({ socket, username, isAdmin, changeUrl }) {
 
     useEffect(() => {
         const asyncFunc = async () => {
-            const user = await GetUser(socket);
-            if (!user || !user.isAdmin) {
-                changeUrl('/login');
-            }
-            else {
-                loadData();
+            if (socketId) {
+                const user = await GetUser(socketId);
+                if (!user || !user.isAdmin) {
+                    changeUrl('/login');
+                }
+                else {
+                    loadData();
+                }
             }
         }
         asyncFunc();
-    }, [socket]);
+    }, [socketId]);
 
     return (
         <main className="h-full overflow-y-auto">

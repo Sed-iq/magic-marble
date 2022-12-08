@@ -1,11 +1,10 @@
-const API_URL = 'http://localhost:5500';
-// const API_URL = 'https://magic-marble-api.herokuapp.com';
-const WEB_URL = 'http://localhost:3000';
-// const WEB_URL = 'https://squid-app-mtjl8.ondigitalocean.app';
+// const API_URL = 'http://localhost:5500';
+const API_URL = 'https://magic-marble-api.herokuapp.com';
+// const WEB_URL = 'http://localhost:3000';
+const WEB_URL = 'https://squid-app-mtjl8.ondigitalocean.app';
 
 const GetUser = async (socketId) => {
-    console.log(socketId);
-    if (socketId) {
+    if (socketId && localStorage.getItem('token') !== "undefined") {
         const token = JSON.parse(localStorage.getItem('token'));
         if (token) {
             // get user info

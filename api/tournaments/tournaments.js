@@ -34,7 +34,7 @@ const initServer = (server) => {
         });
 
         // add Bet
-        socket.on('addedbet', (data) => {
+        socket.on('addbet', (data) => {
             addBet(data);
         });
 
@@ -89,9 +89,7 @@ const startTournament = async (tournamentId) => {
                                     if (matchPlayer && matchPlayer.score > 0) {
                                         player.betTimeSeconds++;
                                         if (player.betTimeSeconds > currentTournaments[tournamentIndex].timePerMove) {
-                                            player.choice = "even";
-                                            player.bet = 1;
-                                            addBet({ tournamentId: tournamentId, player: player });
+                                            addBet({ tournamentId: tournamentId, userId: player.userId, choice: "even", bet: 1 });
                                             messageToAPlayer(tournamentId, player.userId, "autoAddBet", { tournament: currentTournaments[index] })
                                         }
                                     }
@@ -274,13 +272,16 @@ const updateSocket = (socket, data) => {
 const addBet = async (data) => {
     let index = currentTournaments.findIndex(t => t.id === data.tournamentId);
     if (index !== -1) {
-        let playerIdx = currentTournaments[index].currentPlayers.findIndex(p => p.userId === data.player.userId);
+        let playerIdx = currentTournaments[index].currentPlayers.findIndex(p => p.userId === data.userId);
         if (playerIdx !== -1) {
             var playerOne = currentTournaments[index].currentPlayers[playerIdx];
             let matchWithPlayerIdx = currentTournaments[index].currentPlayers.findIndex(p => p.userId === playerOne.matchWith);
             if (matchWithPlayerIdx !== -1) {
                 var playerTwo = currentTournaments[index].currentPlayers[matchWithPlayerIdx];
-                playerOne = data.player;
+                playerOne.choice = data.choice;
+                playerOne.bet = data.bet;
+                playerOne.betTimeSeconds = 0;
+
                 if (playerOne.role === "guesser") {
                     // resolve turn
                     let roundWinner = null;
@@ -352,8 +353,10 @@ const addBet = async (data) => {
                     currentTournaments[index].currentPlayers[playerIdx] = playerOne;
                     currentTournaments[index].currentPlayers[matchWithPlayerIdx] = playerTwo;
 
-                    // updating player records
+                    // sending messages to all sockets
                     messageToAllSockets(data.tournamentId, "winRound", { roundWinner: roundWinner, wonAmount: wonAmount , tournamentId: currentTournaments[index].id });
+                    // updating player records
+                    messageToAllSockets(data.tournamentId, "update", { tournament: currentTournaments[index] });
 
                     if (playerOne.score > 0 && playerTwo.score > 0) {
                         // Changing Roles

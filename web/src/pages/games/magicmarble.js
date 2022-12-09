@@ -9,8 +9,8 @@ import './magicmarble.css';
 
 function SideBar({ changeUrl }) {
     return (
-        <div className='relative hidden md:block w-24 shadow-md bg-[#1c2258] min-h-screen my-0'>
-            <div className='fixed mx-6'>
+        <div className='shrink-0 relative hidden lg:block w-16 shadow-md bg-[#1c2258] min-h-screen my-0'>
+            <div className='fixed h-full mx-5'>
                 <ul>
                     <li className='flex items-center justify-center h-16'>
                         <button id="username2" className="py-4 text-lg font-bold text-gray-200"
@@ -92,7 +92,7 @@ function TopBar({ counterText, language, setLanguage }) {
                 <div className='absolute top-5 inset-x-0 text-center text-white text-2xl rouned p-2'>{counterText}</div>
             }
             <div className='relative flex flex-col gap-2 mb-6'>
-                <div className='w-full relative text-[#d9d9d9] flex align-middle justify-between md:justify-end px-2 py-4 top-2'>
+                <div className='w-full relative text-[#d9d9d9] flex align-middle justify-between lg:justify-end px-2 py-4 top-2'>
                     <div className='flex align-middle gap-3 my-auto'>
                         <a className="transition my-auto cursor-pointer font-bold" id="rules" onClick={showRules}>Game rules</a>
                     </div>
@@ -206,11 +206,11 @@ function TopBar({ counterText, language, setLanguage }) {
                         ></audio>
                     </div>
                 </div>
-                <div className='block flex-col mx-auto gap-2 md:hidden'>
+                <div className='block flex-col mx-auto gap-2 lg:hidden'>
                     <p id='header1' className='text-[#8b30d2] text-4xl text-center'>MAGIC MARBLE</p>
                     <img className='w-56 mx-auto' src="/images/central-logo.svg" alt="image-mobile" />
                 </div>
-                <div className='relative hidden md:block'>
+                <div className='relative hidden lg:block'>
                     <p id='header2' className='absolute inset-0 grid place-content-center text-4xl text-[#d9d9d9]'>MAGIC MARBLE</p>
                     <img className='w-full' src="/images/renewed-logo.svg" alt="image-wide" />
                 </div>
@@ -224,18 +224,20 @@ let myUsername = null;
 export default function MagicMarble({ socketId, socket }) {
     const [userId, setUserId] = useState(null);
     const [tournamentId, setTournamentId] = useState(null);
-    const [playerOneUserId, setPlayerOneUserId] = useState(null);
-    const [playerTwoUserId, setPlayerTwoUserId] = useState(null);
-    const [playerOneUsername, setPlayerOneUsername] = useState(null);
-    const [playerTwoUsername, setPlayerTwoUsername] = useState(null);
-    const [playerOneRole, setPlayerOneRole] = useState(null);
-    const [playerTwoRole, setPlayerTwoRole] = useState(null);
+    const [playerOneUserId, setPlayerOneUserId] = useState('');
+    const [playerTwoUserId, setPlayerTwoUserId] = useState('');
+    const [playerOneUsername, setPlayerOneUsername] = useState('asas');
+    const [playerTwoUsername, setPlayerTwoUsername] = useState('');
+    const [playerOneRole, setPlayerOneRole] = useState('');
+    const [playerTwoRole, setPlayerTwoRole] = useState('');
     const [playerOnePlayerToPlay, setPlayerOnePlayerToPlay] = useState(null);
     const [playerOneLogs, setPlayerOneLogs] = useState([]);
-    const [playerOneScore, setPlayerOneScore] = useState(2);
-    const [playerTwoScore, setPlayerTwoScore] = useState(2);
-    const [playerOneNo, setPlayerOneNo] = useState(0);
+    const [playerOneScore, setPlayerOneScore] = useState(null);
+    const [playerTwoScore, setPlayerTwoScore] = useState(null);
+    const [playerOneNo, setPlayerOneNo] = useState(null);
+    const [loseAmount, setLoseAmount] = useState(null);
     const [wonAmount, setWonAmount] = useState(null);
+    const [wonPlayer, setWonPlayer] = useState(null);
     const [selectedChoice, setSelectedChoice] = useState('even');
     const [selectedAmount, setSelectedAmount] = useState(1);
     const [message, setMessage] = useState('');
@@ -330,17 +332,35 @@ export default function MagicMarble({ socketId, socket }) {
                         <div className="role">{role}</div>
                     </div>
                     {userId === playerOneUserId && receivedMessage &&
-                        <div className="animate-bot-to-bot absolute -bottom-10 text-sm bg-[#9ca3af] border rounded bg-gradient-to-br p-2">
+                        <div className="animate-bot-to-bot absolute -bottom-10 z-50 text-sm bg-[#9ca3af] border rounded bg-gradient-to-br p-2">
                             <div className="text-white font-medium">{receivedMessage}</div>
                         </div>
                     }
-                    {userId === playerOneUserId && wonAmount &&
-                        <div className="animate-small-to-big absolute -bottom-10 text-sm">
-                            <div className="text-green-500 text-5xl font-medium">+{wonAmount}</div>
+
+                </div>
+                <div className="score relative flex flex-col justify-center">
+                    <div className='mx-auto'>{score}</div>
+                    {userId === playerOneUserId && wonPlayer && wonAmount &&
+                        <div className="animate-small-to-big relative mx-auto z-50 text-xs">
+                            <div className="text-green-500 text-2xl font-medium">+{wonAmount}</div>
+                        </div>
+                    }
+                    {userId === playerOneUserId && !wonPlayer && loseAmount &&
+                        <div className="animate-small-to-big relative mx-auto z-50 text-xs">
+                            <div className="text-red-500 text-2xl font-medium">-{loseAmount}</div>
+                        </div>
+                    }
+                    {userId === playerTwoUserId && !wonPlayer && wonAmount &&
+                        <div className="animate-small-to-big relative mx-auto z-50 text-xs">
+                            <div className="text-green-500 text-2xl font-medium">+{wonAmount}</div>
+                        </div>
+                    }
+                    {userId === playerTwoUserId && wonPlayer && loseAmount &&
+                        <div className="animate-small-to-big relative mx-auto z-50 text-xs">
+                            <div className="text-red-500 text-2xl font-medium">-{loseAmount}</div>
                         </div>
                     }
                 </div>
-                <div className="score">{score}</div>
                 <div className="marbles">
                     {renderMarbles(score)}
                 </div>
@@ -508,7 +528,7 @@ export default function MagicMarble({ socketId, socket }) {
                 }
             }
         }
-        // setupFuns();
+        setupFuns();
         asyncFunc();
     }, [socketId]);
 
@@ -581,9 +601,21 @@ export default function MagicMarble({ socketId, socket }) {
                                 if (data.tournamentId === tournamentId) {
                                     let { roundWinner } = data;
                                     if (roundWinner === myUsername) {
+                                        setWonPlayer(true);
                                         setWonAmount(data.wonAmount);
+                                        setReceivedMessage(`You won ${data.wonAmount} marbles in this turn! 👍`);
                                         setTimeout(() => {
                                             setWonAmount(null);
+                                            setReceivedMessage(null);
+                                        }, 4000);
+                                    }
+                                    else{
+                                        setWonPlayer(false);
+                                        setLoseAmount(data.wonAmount);
+                                        setReceivedMessage(`You lost ${data.wonAmount} marbles in this turn! 👎`);
+                                        setTimeout(() => {
+                                            setLoseAmount(null);
+                                            setReceivedMessage(null);
                                         }, 4000);
                                     }
                                 }
@@ -646,13 +678,13 @@ export default function MagicMarble({ socketId, socket }) {
 
     return (
         <>
-            <div className='relative w-full md:flex md:gap-4'>
+            <div className='relative w-full lg:flex lg:gap-4'>
                 <SideBar changeUrl={changeUrl} />
                 <div className='grow'>
-                    <div className='relative flex flex-col w-full md:w-[90%] mx-auto'>
+                    <div className='relative flex flex-col w-full lg:w-[90%] mx-auto'>
                         <TopBar counterText={counterText} language={language} setLanguage={setLanguage} />
-                        <div className='flex'>
-                            <div className='flex flex-col w-full md:w-[65%] md:p-5'>
+                        <div className='lg:flex'>
+                            <div className='flex flex-col w-full lg:w-[65%] lg:p-5'>
                                 <>
                                     <div id="layer-p2">
                                         {playerTwoUserId ?
@@ -673,13 +705,13 @@ export default function MagicMarble({ socketId, socket }) {
                                     </div>
                                 </>
                                 <div id='layer-bet' style={{ display: (playerOneNo === playerOnePlayerToPlay && playerOneScore > 0 && playerTwoScore > 0) ? 'flex' : 'none' }}>
-                                    {betCounterText ? <div className='text-center flex gap-2 align-middle bg-[#1c2258] md:bg-[#0e1232] text-white text-2xl md:text-3xl px-2 pt-2 pb-1 rounded-xl'>
-                                        <img className='w-8 h-8' src='/images/pac-marble.png' alt="pac-marble" />
-                                        <p>
-                                            {betCounterText}
-                                        </p>
-                                    </div>
-                                        : null
+                                    {betCounterText &&
+                                        <div className='text-center flex gap-2 align-middle bg-[#1c2258] lg:bg-[#0e1232] text-white text-2xl md:text-3xl px-2 pt-2 pb-1 rounded-xl'>
+                                            <img className='w-8 h-8' src='/images/pac-marble.png' alt="pac-marble" />
+                                            <p>
+                                                {betCounterText}
+                                            </p>
+                                        </div>
                                     }
                                     <div className="wrapper">
                                         <input id="bet-type" value={selectedChoice} type="checkbox" onClick={(e) => {
@@ -718,7 +750,7 @@ export default function MagicMarble({ socketId, socket }) {
                                     <button className="game-button" onClick={handleSubmit}>Submit</button>
                                 </div>
                             </div>
-                            <div className='flex absolute w-full bottom-0 justify-center md:w-[35%] md:static md:flex-col'>
+                            <div className='static flex w-full bottom-0 justify-center lg:w-[35%] md:flex-col'>
                                 <div id="layer-stats">
                                     {playerOneUserId ?
                                         <>

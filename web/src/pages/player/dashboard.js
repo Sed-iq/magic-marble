@@ -56,7 +56,7 @@ export default function Dashboard({ socketId, username, isAdmin, changeUrl }) {
                         </div>
                         <div>
                             <p className="mb-2 text-sm font-medium text-gray-400">
-                                Played Tournaments
+                                My Tournaments
                             </p>
                             <p className="text-lg font-semibold text-gray-200 transition-all">
                                 {playedTournaments}
@@ -73,10 +73,10 @@ export default function Dashboard({ socketId, username, isAdmin, changeUrl }) {
                         </div>
                         <div>
                             <p className="mb-2 text-sm font-medium text-gray-400">
-                                Won Tournaments
+                                Upcoming Tournaments
                             </p>
                             <p className="text-lg font-semibold text-gray-200 transition-all">
-                                {wonTournaments}
+                                {joinedTournaments}
                             </p>
                         </div>
                     </div>
@@ -89,7 +89,7 @@ export default function Dashboard({ socketId, username, isAdmin, changeUrl }) {
                         </div>
                         <div>
                             <p className="mb-2 text-sm font-medium text-gray-400">
-                                Joined Tournaments
+                                Create new Tournaments
                             </p>
                             <p className="text-lg font-semibold text-gray-200 transition-all">
                                 {joinedTournaments}
@@ -99,15 +99,12 @@ export default function Dashboard({ socketId, username, isAdmin, changeUrl }) {
                     <div className="flex items-center p-4 rounded-lg shadow-xs bg-gray-800">
                         <div className="p-3 mr-4 rounded-full text-blue-100 bg-blue-500">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                                <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
-                                <path fillRule="evenodd"
-                                    d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z"
-                                    clipRule="evenodd" />
+                                <path d="M0 8v-3c0-1.105.895-2 2-2h20c1.104 0 2 .895 2 2v3h-24zm24 3v8c0 1.104-.896 2-2 2h-20c-1.105 0-2-.896-2-2v-8h24zm-15 6h-6v1h6v-1zm3-2h-9v1h9v-1zm9 0h-3v1h3v-1z" />
                             </svg>
                         </div>
                         <div>
                             <p className="mb-2 text-sm font-medium text-gray-400">
-                                Your Live Tournaments
+                                My Wallet
                             </p>
                             <p className="text-lg font-semibold text-gray-200 transition-all">
                                 {liveTournaments}

@@ -95,18 +95,23 @@ export default function Sidebar({ socket, username, isAdmin, sideBarOpen, openen
                                     </button>
                                 </li>
                                 <li className="px-2 py-1 transition-colors duration-150 hover:text-gray-200">
-                                    <button onClick={(e) => changeUrl('/player/tournaments/joined')}>
-                                        Joined
+                                    <button onClick={(e) => changeUrl('/player/tournaments/my')}>
+                                        My Tournaments
                                     </button>
                                 </li>
                                 <li className="px-2 py-1 transition-colors duration-150 hover:text-gray-200">
-                                    <button onClick={(e) => changeUrl('/player/tournaments/live')}>
-                                        Live
+                                    <button onClick={(e) => changeUrl('/player/tournaments/upcoming')}>
+                                        Upcoming
                                     </button>
                                 </li>
                                 <li className="px-2 py-1 transition-colors duration-150 hover:text-gray-200">
-                                    <button onClick={(e) => changeUrl('/player/tournaments/played')}>
-                                        Played
+                                    <button onClick={(e) => changeUrl('/player/tournaments/create')}>
+                                        Create
+                                    </button>
+                                </li>
+                                <li className="px-2 py-1 transition-colors duration-150 hover:text-gray-200">
+                                    <button onClick={(e) => changeUrl('/player/tournaments/history')}>
+                                        History
                                     </button>
                                 </li>
                             </ul>
@@ -117,6 +122,11 @@ export default function Sidebar({ socket, username, isAdmin, sideBarOpen, openen
                         activeBtn('Wallet', 'fas fa-wallet', '/player/wallet')
                         :
                         inactiveBtn('Wallet', 'fas fa-wallet', '/player/wallet')
+                    }
+                    {openendPage === 'Rules' ?
+                        activeBtn('Game Rules', 'fas fa-scale-balanced', '/player/rules')
+                        :
+                        inactiveBtn('Game Rules', 'fas fa-scale-balanced', '/player/rules')
                     }
                     {openendPage === 'Profile' ?
                         activeBtn('Profile', 'fas fa-user', '/player/profile')

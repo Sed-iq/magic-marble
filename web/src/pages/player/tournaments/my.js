@@ -3,12 +3,12 @@ import Loading from '../../../components/Loading';
 
 import { GetUser, PlayerGetAllTournaments } from '../../../utils';
 
-export default function Played({ socketId, username, isAdmin, changeUrl }) {
+export default function My({ socketId, username, isAdmin, changeUrl }) {
     const [isLoading, setIsLoading] = useState(true);
     const [tournaments, setTournaments] = useState([]);
 
-    async function loadTournaments(userId) {
-        const result = await PlayerGetAllTournaments(socketId, 'completed', 'getPlayerTournaments')
+    async function loadTournaments() {
+        const result = await PlayerGetAllTournaments(socketId, 'live', 'getPlayerTournaments')
         if (result) {
             setTournaments(result);
             setIsLoading(false);
@@ -24,7 +24,7 @@ export default function Played({ socketId, username, isAdmin, changeUrl }) {
                     changeUrl('/login');
                 }
                 else {
-                    loadTournaments(user.id);
+                    loadTournaments();
                 }
             }
         }
@@ -35,28 +35,30 @@ export default function Played({ socketId, username, isAdmin, changeUrl }) {
         <main className="h-full overflow-y-auto">
             <div className="container px-6 mx-auto grid">
                 <h2 className="my-6 text-2xl font-semibold text-gray-200">
-                    Played Tournaments
+                    My Tournaments
                 </h2>
                 <div
-                    className="flex items-center justify-between p-4 mb-8 text-sm font-semibold text-gray-600 bg-gray-200 rounded-lg shadow-md focus:outline-none focus:shadow-outline-gray">
+                    className="flex items-center justify-between p-4 mb-8 text-sm font-semibold text-green-600 bg-green-100 rounded-lg shadow-md focus:outline-none focus:shadow-outline-green">
                     <div className="flex items-center">
-                        <span>These tournaments are closed now.</span>
+                        <span>You are currently play these tournaments.</span>
                     </div>
                 </div>
                 <div className="px-4 py-4 mb-8 rounded-lg overflow-auto shadow-md bg-gray-800">
                     <div className="w-full overflow-x-auto">
                         <h4 className="mb-4 font-semibold text-gray-300">
-                            These all are tournaments you already played.
+                            These all are tournaments are live now.
                         </h4>
                         <table className="w-full whitespace-no-wrap">
                             <thead>
                                 <tr
                                     className="text-xs font-semibold tracking-wide text-left uppercase border-b border-gray-700 text-gray-400 bg-gray-800">
                                     <th className="px-4 py-3">Name</th>
-                                    <th className="px-4 py-3">Winner</th>
+                                    <th className="px-4 py-3">Prize Funds</th>
+                                    <th className="px-4 py-3">Action</th>
+                                    <th className="px-4 py-3">Current Players</th>
                                     <th className="px-4 py-3">Max Players</th>
-                                    <th className="px-4 py-3">Start At</th>
-                                    <th className="px-4 py-3">Finish At</th>
+                                    <th className="px-4 py-3">Date</th>
+                                    <th className="px-4 py-3">Time</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-700 bg-gray-800">
@@ -66,24 +68,39 @@ export default function Played({ socketId, username, isAdmin, changeUrl }) {
                                             <p className="font-semibold">{tournament.name}</p>
                                         </td>
                                         <td className="px-4 py-3 text-sm">
-                                            <p className="font-semibold">{tournament.winner}</p>
+                                            <p className="font-semibold">{tournament.prizeAndDistribution}</p>
+                                        </td>
+                                        <td className="px-4 py-3 text-sm">
+                                            <div className="flex items-center space-x-4 text-sm">
+                                                <button onClick={(e) => changeUrl('/player/tournaments/view?id=' + tournament.id)}
+                                                    className="px-2 py-1 font-semibold leading-tight rounded bg-yellow-700 text-yellow-100">
+                                                    View
+                                                </button>
+                                                <button onClick={(e) => changeUrl('/games/magicmarble?id=' + tournament.id)}
+                                                    className="px-2 py-1 font-semibold leading-tight rounded bg-green-700 text-green-100">
+                                                    Play
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3 text-sm">
+                                            <p className="font-semibold">{tournament.playersArr.length}</p>
                                         </td>
                                         <td className="px-4 py-3 text-sm">
                                             <p className="font-semibold">{tournament.maxPlayers}</p>
                                         </td>
                                         <td className="px-4 py-3 text-sm">
-                                            <p className="font-semibold">{new Date(tournament.startDateTime).toLocaleDateString()} {new Date(tournament.startDateTime).toLocaleTimeString()}</p>
+                                            <p className="font-semibold">{new Date(tournament.startDateTime).toLocaleDateString()}</p>
                                         </td>
                                         <td className="px-4 py-3 text-sm">
-                                            <p className="font-semibold">{new Date(tournament.endDateTime).toLocaleDateString()} {new Date(tournament.endDateTime).toLocaleTimeString()}</p>
+                                            <p className="font-semibold">{new Date(tournament.startDateTime).toLocaleTimeString()}</p>
                                         </td>
                                     </tr>
                                 ))}
-                                {!isLoading && tournaments.length === 0 &&
+                                {!isLoading && tournaments.length === 0 && (
                                     <tr className="text-gray-400">
-                                        <td colSpan="6" className="text-center px-4 py-3">No played tournaments</td>
+                                        <td colSpan="6" className="text-center px-4 py-3">No Live tournaments</td>
                                     </tr>
-                                }
+                                )}
                                 {isLoading &&
                                     <tr className="text-gray-400">
                                         <td colSpan="6" className="text-center px-4 py-3">

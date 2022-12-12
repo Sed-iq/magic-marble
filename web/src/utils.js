@@ -9,12 +9,37 @@ const GetUser = async (socketId) => {
         if (token) {
             // get user info
             if (socketId) {
-                const response = await fetch(`${API_URL}/getuser`, {
+                const response = await fetch(`${API_URL}/getUser`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`,
                         'SocketId': socketId
+                    }
+                });
+
+                const data = await response.json();
+                if (!data.error) {
+                    return data.user;
+                }
+            }
+        }
+    }
+    return null;
+}
+
+const GetUserWithUserId = async (socketId, userId) => {
+    if (socketId && localStorage.getItem('token') !== "undefined") {
+        const token = JSON.parse(localStorage.getItem('token'));
+        if (token) {
+            // get user info
+            if (socketId && userId) {
+                const response = await fetch(`${API_URL}/getUserWithUserId`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'UserId': userId
                     }
                 });
 
@@ -123,6 +148,42 @@ const UpdateUser = async (socketId, username) => {
     }
 }
 
+const UpdateUserAdminAccess = async (socketId, userId, adminAccess) => {
+    const user = await GetUserWithUserId(socketId, userId);
+    if (user) {
+        console.log(user.adminAccess, adminAccess);
+        if (user.adminAccess !== adminAccess) {
+            const response = await fetch(`${API_URL}/updateUserAdminAccess`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: user.id,
+                    adminAccess: adminAccess
+                })
+            });
+            const data = await response.json();
+            if (!data.error) {
+                alert('User access updated successfully');
+                return true;
+            }
+            else {
+                alert(data.error);
+                return false;
+            }
+        }
+        else {
+            alert('No changes made');
+            return false;
+        }
+    }
+    else {
+        alert('User not found');
+        return null;
+    }
+}
+
 const DeleteUser = async (socketId) => {
     if (window.confirm("Are you sure to delete your account?")) {
         const user = await GetUser(socketId);
@@ -156,7 +217,7 @@ const DeleteUser = async (socketId) => {
 const CreateTournament = async (socketId, name, description, rules, tournamentType, prizeAndDistribution, timePerMove, timeBetweenRounds, maxParticipants, optionalLink, dateTime) => {
     const user = await GetUser(socketId);
     if (user) {
-        if (user.isAdmin) {
+        if (user.isAdmin || user.adminAccess) {
             if (name.length > 0 && description.length > 0 && rules.length > 0 && prizeAndDistribution.length > 0 && timePerMove.length > 0 && timeBetweenRounds.length > 0 && maxParticipants.length > 0 && dateTime.length > 0) {
                 const date = new Date(dateTime);
                 if (date < new Date()) {
@@ -197,9 +258,9 @@ const CreateTournament = async (socketId, name, description, rules, tournamentTy
                 return false;
             }
         }
-        else {
-            alert("Only admin can create tournament");
-            return false;
+        else{
+            alert('You must be an admin or have admin access to create a tournament');
+            return null;
         }
     }
     else {
@@ -323,40 +384,34 @@ const GetATournament = async (socketId, tournamentId) => {
     }
 }
 
-const AdminGetAllTournaments = async (socketId, status) => {
+const GetAllTournaments = async (socketId, status) => {
     const user = await GetUser(socketId);
     if (user) {
-        if (user.isAdmin) {
-            const response = await fetch(`${API_URL}/getAllTournaments/?userId=${user.id}&status=${status}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            });
-            const data = await response.json();
-            if (!data.error) {
-                return data.tournaments;
-            }
-            else {
-                return null;
-            }
+        const response = await fetch(`${API_URL}/getAllTournaments/?userId=${user.id}&status=${status}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        const data = await response.json();
+        if (!data.error) {
+            return data.tournaments;
         }
         else {
-            alert('You are not admin');
             return null;
         }
     }
     else {
-        alert('You must be logged in to delete a tournament');
+        alert('You must be logged in to get all tournaments');
         return null;
     }
 }
 
-const PlayerGetAllTournaments = async (socketId, status, purpose) => {
+const PlayerGetAllTournaments = async (socketId, status) => {
     const user = await GetUser(socketId);
     if (user) {
         if (!user.isAdmin) {
-            const response = await fetch(`${API_URL}/${purpose}/?userId=${user.id}&status=${status}`, {
+            const response = await fetch(`${API_URL}/getPlayerTournaments/?userId=${user.id}&status=${status}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -538,12 +593,13 @@ export {
     RegisterUser,
     LoginUser,
     UpdateUser,
+    UpdateUserAdminAccess,
     DeleteUser,
     CreateTournament,
     UpdateTournament,
     DeleteTournament,
     GetATournament,
-    AdminGetAllTournaments,
+    GetAllTournaments,
     PlayerGetAllTournaments,
     JoinTournament,
     LeaveTournament,

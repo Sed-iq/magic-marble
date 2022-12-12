@@ -1,17 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import Loading from '../../components/Loading';
 
-import { GetUser, GetAllPlayers } from '../../utils';
+import { GetUser, GetAllPlayers, UpdateUserAdminAccess } from '../../utils';
 
 export default function Players({ socketId, username, isAdmin, changeUrl }) {
     const [isLoading, setIsLoading] = useState(true);
-
     const [players, setPlayers] = useState([]);
+
+
+    async function changeAdminAccess(userId, adminAccess) {
+        const result = await UpdateUserAdminAccess(socketId, userId, adminAccess);
+        if (result !== null) {
+            if (result) {
+                console.log('success');
+                loadPlayers();
+            }
+        }
+        else {
+            changeUrl('/login')
+        }
+    }
 
     async function loadPlayers() {
         const result = await GetAllPlayers(socketId);
         if (result !== null) {
             if (result) {
+                console.log(result);
                 setPlayers(result);
             }
             setIsLoading(false);
@@ -59,6 +73,7 @@ export default function Players({ socketId, username, isAdmin, changeUrl }) {
                                 <tr
                                     className="text-xs font-semibold tracking-wide text-left uppercase border-b border-gray-700 text-gray-400 bg-gray-800">
                                     <th className="px-4 py-3">Username</th>
+                                    <th className="px-4 py-3">Admin Access</th>
                                     <th className="px-4 py-3">Total Tournaments</th>
                                     <th className="px-4 py-3">Progress</th>
                                     <th className="px-4 py-3">Status</th>
@@ -71,6 +86,22 @@ export default function Players({ socketId, username, isAdmin, changeUrl }) {
                                         <tr key={index} className="text-gray-400">
                                             <td className="px-4 py-3">
                                                 {player.username}
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                {player.status === 'active' ?
+                                                    player.adminAccess ?
+                                                        <input type="checkbox" className="form-checkbox h-5 w-5 accent-green-600" checked={true} onChange={() => changeAdminAccess(player.id, false)} />
+                                                        :
+                                                        <input type="checkbox" className="form-checkbox h-5 w-5 accent-green-600" checked={false} onChange={() => changeAdminAccess(player.id, true)} />
+                                                    : null
+                                                }
+                                                {player.status === 'inactive' ?
+                                                    player.adminAccess ?
+                                                        <input type="checkbox" className="form-checkbox h-5 w-5 accent-green-600" checked disabled />
+                                                        :
+                                                        <input type="checkbox" className="form-checkbox h-5 w-5 accent-green-600" disabled />
+                                                    : null
+                                                }
                                             </td>
                                             <td className="px-4 py-3 text-sm">
                                                 {player.tournamentsArr ? player.tournamentsArr.length : 0}
@@ -100,14 +131,14 @@ export default function Players({ socketId, username, isAdmin, changeUrl }) {
                                 })}
                                 {!isLoading && players.length === 0 &&
                                     <tr className="text-gray-400">
-                                        <td colSpan="5" className="text-center px-4 py-3">
+                                        <td colSpan="6" className="text-center px-4 py-3">
                                             No players found
                                         </td>
                                     </tr>
                                 }
                                 {isLoading &&
                                     <tr className="text-gray-400">
-                                        <td colSpan="5" className="text-center px-4 py-3">
+                                        <td colSpan="6" className="text-center px-4 py-3">
                                             <Loading />
                                         </td>
                                     </tr>

@@ -8,8 +8,26 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    username: String,
-    password: String,
+    email:{
+        type: String,
+    },
+    username: {
+        type: String,
+        unique: true,
+        required: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    wallet: {
+        type: Number,
+        default: 0
+    },
+    adminAccess: {
+        type: Boolean,
+        default: true
+    },
     isAdmin: Boolean,
     createDateTime: String,
     deleteDateTime: String,

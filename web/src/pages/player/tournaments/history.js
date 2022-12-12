@@ -52,7 +52,7 @@ export default function History({ socketId, username, isAdmin, changeUrl }) {
                             <thead>
                                 <tr
                                     className="text-xs font-semibold tracking-wide text-left uppercase border-b border-gray-700 text-gray-400 bg-gray-800">
-                                    <th className="px-4 py-3">Name</th>
+                                    <th className="px-4 py-3">Title</th>
                                     <th className="px-4 py-3">Winner</th>
                                     <th className="px-4 py-3">Max Players</th>
                                     <th className="px-4 py-3">Start At</th>

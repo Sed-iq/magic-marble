@@ -109,6 +109,30 @@ const updateUser = (req, res) => {
     });
 }
 
+// update user like admin access
+const updateUserAdminAccess = (req, res) => {
+    let { userId, adminAccess } = req.body;
+    User.findOne({ id: userId }, (err, user) => {
+        if (err) {
+            return res.status(500).json({ error: err._message });
+        }
+        console.log('agya hoo tum sunao');
+        User.findOneAndUpdate({ id: userId }, { adminAccess: adminAccess }, (err, user) => {
+            if (err) {
+                return res.status(500).json({ error: err._message });
+            }
+            if (!user) {
+                return res.status(400).json({ error: 'User does not exist' });
+            }
+            if (user.status === 'inactive') {
+                return res.status(400).json({ error: 'User account has been deleted' });
+            }
+            res.status(200).json({ user: user });
+        });
+    });
+}
+
+
 // detete
 const deleteUser = (req, res) => {
     let { userId } = req.body;
@@ -188,6 +212,48 @@ const getUser = (req, res) => {
     });
 }
 
+// get a user
+const getUserWithUserId = (req, res) => {
+    const token = req.headers.authorization.split(' ')[1];
+    const userId = req.headers.userid;
+    if (!token) {
+        return res.status(403).json({ error: 'No token provided' });
+    }
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to authenticate token' });
+        }
+        User.findOne({ id: decoded.id }, (err, user) => {
+            if (err) {
+                return res.status(500).json({ error: err._message });
+            }
+            if (!user) {
+                return res.status(400).json({ error: 'User does not exist' });
+            }
+            if (user.status === 'inactive') {
+                return res.status(400).json({ error: 'User account has been deleted' });
+            }
+            if (!user.isAdmin) {
+                return res.status(400).json({ error: 'User is not admin' });
+            }
+            User.findOne({ id: userId }, (err, user) => {
+                if (err) {
+                    return res.status(500).json({ error: err._message });
+                }
+                if (!user) {
+                    return res.status(400).json({ error: 'User does not exist' });
+                }
+                if (user.status === 'inactive') {
+                    return res.status(400).json({ error: 'User account has been deleted' });
+                }
+                // separate password and other attributes from user
+                const { password, ...userWithoutPassword } = user._doc;
+                return res.status(200).json({ user: userWithoutPassword });
+            });
+        });
+    });
+}
+
 // get all players
 const getAllPlayers = (req, res) => {
     let { userId } = req.query;
@@ -212,11 +278,13 @@ const getAllPlayers = (req, res) => {
             for (let user of users) {
                 const tournaments = await Tournament.find({ status: 'completed', winnerId: user.id });
                 let userWithoutPassword = {
+                    id: user.id,
                     username: user.username,
                     tournamentsArr: user.tournamentsArr,
                     wins: tournaments.length,
                     status: user.status,
                     createDateTime: user.createDateTime,
+                    adminAccess: user.adminAccess,
                 };
                 usersWithoutPassword.push(userWithoutPassword);
             }
@@ -238,9 +306,6 @@ const createTournament = (req, res) => {
         if (user.status === 'inactive') {
             return res.status(400).json({ error: 'User account has been deleted' });
         }
-        if (!user.isAdmin) {
-            return res.status(400).json({ error: 'User is not an admin' });
-        }
         Tournament.findOne({ name: name, status: { $nin: ['deleted'] } }, (err, tournament) => {
             if (err) {
                 return res.status(500).json({ error: err._message });
@@ -261,6 +326,7 @@ const createTournament = (req, res) => {
                     name: name,
                     status: 'upcoming',
                     rules: rules,
+                    createdBy: user.id,
                     tournamentType: tournamentType,
                     maxPlayers: maxPlayers,
                     timePerMove: timePerMove,
@@ -326,9 +392,6 @@ const joinTournament = (req, res) => {
             }
             if (tournament.playersArr.includes(userId)) {
                 return res.status(400).json({ error: 'User is already in tournament' });
-            }
-            if (user.isAdmin) {
-                return res.status(400).json({ error: 'Admin cannot join tournament' });
             }
             user.tournamentsArr.push(tournamentId);
             tournament.playersArr.push(userId);
@@ -577,9 +640,6 @@ const getAllTournaments = (req, res) => {
         if (user.status === 'inactive') {
             return res.status(400).json({ error: 'User account has been deleted' });
         }
-        if (!user.isAdmin) {
-            return res.status(400).json({ error: 'User is not an admin' });
-        }
         Tournament.find({ status: status }, async (err, tournaments) => {
             if (err) {
                 return res.status(500).json({ error: err._message });
@@ -635,44 +695,7 @@ const getAdminDashboardData = (req, res) => {
     });
 }
 
-// get all tounraments in which player is not present
-const getTournamentsForPlayer = (req, res) => {
-    let { userId, status } = req.query;
-    User.findOne({ id: userId }, (err, user) => {
-        if (err) {
-            return res.status(500).json({ error: err._message });
-        }
-        if (!user) {
-            return res.status(400).json({ error: 'User does not exist' });
-        }
-        if (user.status === 'inactive') {
-            return res.status(400).json({ error: 'User account has been deleted' });
-        }
-        if (user.isAdmin) {
-            return res.status(400).json({ error: 'User is an admin' });
-        }
-        Tournament.find({ playersArr: { $nin: [userId] }, status: status }, (err, tournaments) => {
-            if (err) {
-                return res.status(500).json({ error: err._message });
-            }
-            if (tournaments.length === 0) {
-                return res.status(200).json({ tournaments: [] });
-            }
-            if (status === 'upcoming') {
-                let tournamentsArr = [];
-                tournaments.forEach(tournament => {
-                    if (tournament.playersArr.length < tournament.maxPlayers && new Date(tournament.startDateTime) > new Date()) {
-                        tournamentsArr.push(tournament);
-                    }
-                });
-                return res.status(200).json({ tournaments: tournamentsArr });
-            }
-            return res.status(200).json({ tournaments: tournaments });
-        });
-    });
-}
-
-// get all players in a tournament
+// get all tournaments where player is registered
 const getPlayerTournaments = (req, res) => {
     let { userId, status } = req.query;
     User.findOne({ id: userId }, (err, user) => {
@@ -748,8 +771,10 @@ module.exports = {
     register,
     login,
     updateUser,
+    updateUserAdminAccess,
     deleteUser,
     getUser,
+    getUserWithUserId,
     getAllPlayers,
     createTournament,
     joinTournament,
@@ -760,6 +785,5 @@ module.exports = {
     getAllTournaments,
     getAdminDashboardData,
     getPlayerDashboardData,
-    getTournamentsForPlayer,
     getPlayerTournaments,
 }

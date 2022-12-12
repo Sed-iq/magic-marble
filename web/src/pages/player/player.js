@@ -23,6 +23,7 @@ export default function Player({ socketId }) {
     const [sideBarOpen, setSideBarOpen] = useState(localStorage.getItem('sideBarOpen') === 'true' || false);
     const [openendPage, setOpenedPage] = useState('');
     const [username, setUsername] = useState('');
+    const [adminAccess, setAdminAccess] = useState(false);
 
     const navigate = useNavigate();
 
@@ -51,9 +52,11 @@ export default function Player({ socketId }) {
             setOpenedPage('Setting');
         } else if (window.location.pathname === '/player/tournaments/all') {
             setOpenedPage('Tournaments');
-        } else if (window.location.pathname === '/player/tournaments/joined') {
+        } else if (window.location.pathname === '/player/tournaments/my') {
             setOpenedPage('Tournaments');
-        } else if (window.location.pathname === '/player/tournaments/live') {
+        } else if (window.location.pathname === '/player/tournaments/upcoming') {
+            setOpenedPage('Tournaments');
+        } else if (window.location.pathname === '/player/tournaments/create') {
             setOpenedPage('Tournaments');
         } else if (window.location.pathname === '/player/tournaments/history') {
             setOpenedPage('Tournaments');
@@ -63,7 +66,6 @@ export default function Player({ socketId }) {
     }
 
     useEffect(() => {
-        console.log(socketId);
         const asyncFunc = async () => {
             if (socketId) {
                 const user = await GetUser(socketId);
@@ -72,6 +74,7 @@ export default function Player({ socketId }) {
                 }
                 else {
                     setUsername(user.username);
+                    setAdminAccess(user.adminAccess);
                     checkPage();
                 }
             }
@@ -82,7 +85,7 @@ export default function Player({ socketId }) {
 
     return (
         <div className="flex h-screen bg-gray-900">
-            <Sidebar socketId={socketId} username={username} isAdmin={false} sideBarOpen={sideBarOpen} openendPage={openendPage} changeUrl={changeUrl} />
+            <Sidebar socketId={socketId} username={username} isAdmin={false} adminAccess={adminAccess} sideBarOpen={sideBarOpen} openendPage={openendPage} changeUrl={changeUrl} />
             <div className="flex flex-col flex-1 w-full">
                 <Navbar socketId={socketId} username={username} isAdmin={false} sideBarOpen={sideBarOpen} toggleSideBar={toggleSideBar} changeUrl={changeUrl} />
                 <Routes>
@@ -92,7 +95,7 @@ export default function Player({ socketId }) {
                     <Route path="/profile" element={<Profile socketId={socketId} username={username} isAdmin={false} changeUrl={changeUrl} />} />
                     <Route path="/setting" element={<Setting socketId={socketId} username={username} isAdmin={false} setUsername={setUsername} changeUrl={changeUrl} />} />
                     <Route path="/tournaments/all" element={<All socketId={socketId} username={username} isAdmin={false} changeUrl={changeUrl} />} />
-                    <Route path="/tournaments/create" element={<Create socketId={socketId} username={username} isAdmin={false} changeUrl={changeUrl} />} />
+                    <Route path="/tournaments/create" element={<Create socketId={socketId} adminAccess={adminAccess} username={username} isAdmin={false} changeUrl={changeUrl} />} />
                     <Route path="/tournaments/upcoming" element={<Upcoming socketId={socketId} username={username} isAdmin={false} changeUrl={changeUrl} />} />
                     <Route path="/tournaments/my" element={<My socketId={socketId} username={username} isAdmin={false} changeUrl={changeUrl} />} />
                     <Route path="/tournaments/history" element={<History socketId={socketId} username={username} isAdmin={false} changeUrl={changeUrl} />} />

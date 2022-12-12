@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Loading from '../../../components/Loading';
 
-import { GetUser, PlayerGetAllTournaments, JoinTournament } from '../../../utils';
+import { GetUser, GetAllTournaments } from '../../../utils';
 
 export default function All({ socketId, username, isAdmin, changeUrl }) {
     const [popupAllowed, setPopupAllowed] = useState('');
@@ -10,74 +10,8 @@ export default function All({ socketId, username, isAdmin, changeUrl }) {
     const [upcomingTournaments, setUpcomingTournaments] = useState([]);
     const [liveTournaments, setLiveTournaments] = useState([]);
 
-    async function joinTournament(tournamentId) {
-        const result = await JoinTournament(socketId, tournamentId);
-        if (result !== null) {
-            if (result) {
-                changeUrl(`/player/tournaments/joined`);
-            }
-        }
-        else {
-            changeUrl('/login');
-        }
-    }
-
-    function dateToAgo(dateTime) {
-        let date = new Date(dateTime);
-        const currentDate = new Date();
-        const year = currentDate.getFullYear() - date.getFullYear();
-        const month = currentDate.getMonth() - date.getMonth();
-        const day = currentDate.getDate() - date.getDate();
-        if (year > 0) {
-            return year + " Year Ago";
-        }
-        else if (month > 0) {
-            return month + " Month Ago";
-        }
-        else if (day > 0) {
-            return day + " Day Ago";
-        }
-        else {
-            return "Today";
-        }
-    }
-
-    function renderTournament(key, status, tournament) {
-        return (
-            <div key={key} className="bg-gray-900 my-2 rounded w-64 flex-shrink-0">
-                <div className="relative flex flex-col p-4">
-                    <p className="mb-2 text-xl font-bold text-gray-300">
-                        {tournament.name}
-                    </p>
-                    <p className="mb-2 text-sm font-medium text-gray-400">
-                        {tournament.description}
-                    </p>
-                    <p className="text-xs font-semibold text-gray-400">
-                        <i className="fa-solid fa-users"></i> {tournament.playersArr.length}/{tournament.maxPlayers}
-                    </p>
-                    <p className="text-xs mt-1 font-semibold text-gray-400">
-                        <i className={"fa-solid" + (status === 'upcoming' ? " fa-hourglass-start" : " fa-check")}></i> {new Date(tournament.startDateTime).toLocaleDateString()} {new Date(tournament.startDateTime).toLocaleTimeString()}
-                    </p>
-                    <p className="absolute right-2 top-0 text-sm mt-1 font-semibold text-red-400">
-                        <i className="animate-pulse fa-solid fa-clock"></i> {dateToAgo(new Date(tournament.startDateTime))}
-                    </p>
-                    <div className="grid grid-cols-2 gap-2">
-                        <button onClick={(e) => changeUrl('/player/tournaments/view?id=' + tournament.id)}
-                            className="px-6 py-2 w-fit mt-4 text-sm font-medium leading-5 text-green-600 transition-colors duration-150 bg-transparent border border-transparent border-green-600 rounded-lg active:bg-green-600 hover:bg-green-700 hover:text-white focus:outline-none focus:shadow-outline-green">
-                            View
-                        </button>
-                        {(status === 'upcoming') ? <button onClick={(e) => joinTournament(tournament.id)}
-                            className="animate-pulse px-6 py-2 mt-4 text-sm font-medium leading-5 text-indigo-600 transition-colors duration-150 bg-transparent border border-transparent border-indigo-600 rounded-lg active:bg-indigo-600 hover:bg-indigo-700 hover:text-white focus:outline-none focus:shadow-outline-indigo">
-                            Join
-                        </button> : null}
-                    </div>
-                </div>
-            </div >
-        )
-    }
-
-    async function loadTournaments(status) {
-        const result = await PlayerGetAllTournaments(socketId, status, 'getTournamentsForPlayer')
+    async function loadTournaments(status) { // getTournamentsForPlayer
+        const result = await GetAllTournaments(socketId, status)
         if (result) {
             if (status === 'upcoming') {
                 setUpcomingTournaments(result);
@@ -128,50 +62,138 @@ export default function All({ socketId, username, isAdmin, changeUrl }) {
                         <span>You can browse any tournament</span>
                     </div>
                 </div>
+
                 {popupAllowed === 'Yes' ?
-                    <div className="px-4 py-4 mb-8 rounded-lg overflow-auto shadow-md bg-gray-800">
-                        <div className="w-full overflow-x-auto mb-4">
-                            <h4 className="font-semibold text-gray-300">
-                                <i className="animate-pulse fa-solid fa-circle text-green-600"></i> Upcoming Tournaments
-                            </h4>
-                            <div className="flex mx-4 items-center space-x-6 overflow-x-auto">
-                                {!isLoading01 && upcomingTournaments.map((tournament, index) => {
-                                    return renderTournament(index, 'upcoming', tournament);
-                                })}
-                                {!isLoading01 && upcomingTournaments.length === 0 && (
-                                    <div className="text-center px-2 py-2 text-sm text-gray-400">
-                                        No Data To Show
-                                    </div>
-                                )}
-                                {isLoading01 && (
-                                    <div className="text-center px-2 py-2 text-sm text-gray-400">
-                                        <Loading />
-                                    </div>
-                                )}
+                    <>
+                        <div className="px-4 py-4 mb-8 rounded-lg overflow-auto shadow-md bg-gray-800">
+                            <div className="w-full overflow-x-auto">
+                                <h4 className="mb-4 font-semibold text-gray-300">
+                                    These all are upcoming tournaments.
+                                </h4>
+                                <table className="w-full whitespace-no-wrap">
+                                    <thead>
+                                        <tr
+                                            className="text-xs font-semibold tracking-wide text-left uppercase border-b border-gray-700 text-gray-400 bg-gray-800">
+                                            <th className="px-4 py-3">Title</th>
+                                            <th className="px-4 py-3">Prize Fund</th>
+                                            <th className="px-4 py-3">Action</th>
+                                            <th className="px-4 py-3">Buy-in</th>
+                                            <th className="px-4 py-3">Max Players</th>
+                                            <th className="px-4 py-3">Date & Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-700 bg-gray-800">
+                                        {!isLoading01 && upcomingTournaments.map((tournament, index) => (
+                                            <tr key={index} className="text-gray-400">
+                                                <td className="px-4 py-3">
+                                                    <p className="font-semibold">{tournament.name}</p>
+                                                </td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    <p className="font-semibold">{tournament.prizeAndDistribution}</p>
+                                                </td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    <div className="flex items-center space-x-4 text-sm">
+                                                        <button onClick={(e) => changeUrl('/player/tournaments/view?id=' + tournament.id)}
+                                                            className="px-2 py-1 font-semibold leading-tight rounded bg-yellow-700 text-yellow-100">
+                                                            View
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    <p className="font-semibold">{tournament.playersArr.length}</p>
+                                                </td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    <p className="font-semibold">{tournament.maxPlayers}</p>
+                                                </td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    <p className="font-semibold">{new Date(tournament.startDateTime).toLocaleDateString()}  {new Date(tournament.startDateTime).toLocaleTimeString()}</p>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {!isLoading01 && upcomingTournaments.length === 0 && (
+                                            <tr className="text-gray-400">
+                                                <td colSpan="6" className="text-center px-4 py-3">No Upcoming tournaments</td>
+                                            </tr>
+                                        )}
+                                        {isLoading01 &&
+                                            <tr className="text-gray-400">
+                                                <td colSpan="6" className="text-center px-4 py-3">
+                                                    <Loading />
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                        <hr className='border-gray-900'></hr>
-                        <div className="w-full mt-2 overflow-x-auto">
-                            <h4 className="font-semibold text-gray-300">
-                                <i className="animate-pulse fa-solid fa-circle text-red-600 duration-150 transition"></i> Live Tournaments
-                            </h4>
-                            <div className="flex mx-4 items-center space-x-6 overflow-x-auto">
-                                {!isLoading02 && liveTournaments.map((tournament, index) => {
-                                    return renderTournament(index, 'live', tournament);
-                                })}
-                                {!isLoading02 && liveTournaments.length === 0 && (
-                                    <div className="text-center px-2 py-2 text-sm text-gray-400">
-                                        No Data To Show
-                                    </div>
-                                )}
-                                {isLoading02 && (
-                                    <div className="text-center px-2 py-2 text-sm text-gray-400">
-                                        <Loading />
-                                    </div>
-                                )}
+                        <div className="px-4 py-4 mb-8 rounded-lg overflow-auto shadow-md bg-gray-800">
+                            <div className="w-full overflow-x-auto">
+                                <h4 className="mb-4 font-semibold text-gray-300">
+                                    These all are live tournaments.
+                                </h4>
+                                <table className="w-full whitespace-no-wrap">
+                                    <thead>
+                                        <tr
+                                            className="text-xs font-semibold tracking-wide text-left uppercase border-b border-gray-700 text-gray-400 bg-gray-800">
+                                            <th className="px-4 py-3">Title</th>
+                                            <th className="px-4 py-3">Prize Fund</th>
+                                            <th className="px-4 py-3">Action</th>
+                                            <th className="px-4 py-3">Buy-in</th>
+                                            <th className="px-4 py-3">Max Players</th>
+                                            <th className="px-4 py-3">Date & Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-700 bg-gray-800">
+                                        {!isLoading02 && liveTournaments.map((tournament, index) => (
+                                            <tr key={index} className="text-gray-400">
+                                                <td className="px-4 py-3">
+                                                    <p className="font-semibold">{tournament.name}</p>
+                                                </td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    <p className="font-semibold">{tournament.prizeAndDistribution}</p>
+                                                </td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    <div className="flex align-middle items-center space-x-4 text-sm">
+                                                        <button onClick={(e) => changeUrl('/player/tournaments/view?id=' + tournament.id)}
+                                                            className="my-auto px-2 py-1 font-semibold leading-tight rounded bg-yellow-700 text-yellow-100">
+                                                            View
+                                                        </button>
+                                                        {tournament.live &&
+                                                            <button onClick={(e) => changeUrl('/games/magicmarble?id=' + tournament.id)}
+                                                                className="my-auto px-2 py-1 font-semibold leading-tight rounded bg-green-700 text-green-100">
+                                                                Play
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    <p className="font-semibold">{tournament.playersArr.length}</p>
+                                                </td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    <p className="font-semibold">{tournament.maxPlayers}</p>
+                                                </td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    <p className="font-semibold">{new Date(tournament.startDateTime).toLocaleDateString()}  {new Date(tournament.startDateTime).toLocaleTimeString()}</p>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {!isLoading02 && liveTournaments.length === 0 && (
+                                            <tr className="text-gray-400">
+                                                <td colSpan="6" className="text-center px-4 py-3">No Live tournaments</td>
+                                            </tr>
+                                        )}
+                                        {isLoading02 &&
+                                            <tr className="text-gray-400">
+                                                <td colSpan="6" className="text-center px-4 py-3">
+                                                    <Loading />
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                    </div>
+                    </>
                     :
                     popupAllowed === 'No' ?
                         <div className="px-4 py-4 mb-8 rounded-lg overflow-auto shadow-md bg-gray-800">

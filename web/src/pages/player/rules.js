@@ -23,12 +23,12 @@ export default function Rules({ socketId, username, isAdmin, changeUrl }) {
                 </h2>
                 <div className="px-4 py-3 mb-4 rounded-lg shadow-md bg-pink-500">
                     <p className="text-sm text-white">
-                        Rules for game that how to play and how to win.
+                    Learn how to play in under 5 minutes.
                     </p>
                 </div>
                 <div className="px-4 py-3 mb-8 rounded-lg shadow-md bg-gray-800">
                     <h4 className="mb-4 font-semibold text-gray-300">
-                        Rules
+                        There are some rules for game.
                     </h4>
                     <div className='flex gap-2 mb-4 align-middle'>
                         <h1 className="my-auto text-2xl font-semibold text-gray-200">

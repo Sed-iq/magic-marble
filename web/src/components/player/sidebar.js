@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function Sidebar({ socket, username, isAdmin, sideBarOpen, openendPage, changeUrl }) {
+export default function Sidebar({ socket, username, adminAccess, isAdmin, sideBarOpen, openendPage, changeUrl }) {
     const [menuBarOpen, setMenuBarOpen] = useState((localStorage.getItem('menuBarOpen') === 'true') || false);
 
     function logoutUser() {
@@ -95,20 +95,21 @@ export default function Sidebar({ socket, username, isAdmin, sideBarOpen, openen
                                     </button>
                                 </li>
                                 <li className="px-2 py-1 transition-colors duration-150 hover:text-gray-200">
-                                    <button onClick={(e) => changeUrl('/player/tournaments/my')}>
-                                        My Tournaments
-                                    </button>
-                                </li>
-                                <li className="px-2 py-1 transition-colors duration-150 hover:text-gray-200">
                                     <button onClick={(e) => changeUrl('/player/tournaments/upcoming')}>
                                         Upcoming
                                     </button>
                                 </li>
                                 <li className="px-2 py-1 transition-colors duration-150 hover:text-gray-200">
-                                    <button onClick={(e) => changeUrl('/player/tournaments/create')}>
-                                        Create
+                                    <button onClick={(e) => changeUrl('/player/tournaments/my')}>
+                                        My Tournaments
                                     </button>
                                 </li>
+                                {adminAccess &&
+                                    <li className="px-2 py-1 transition-colors duration-150 hover:text-gray-200">
+                                        <button onClick={(e) => changeUrl('/player/tournaments/create')}>
+                                            Create
+                                        </button>
+                                    </li>}
                                 <li className="px-2 py-1 transition-colors duration-150 hover:text-gray-200">
                                     <button onClick={(e) => changeUrl('/player/tournaments/history')}>
                                         History

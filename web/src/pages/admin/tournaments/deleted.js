@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Loading from '../../../components/Loading';
 
-import { GetUser, AdminGetAllTournaments } from '../../../utils';
+import { GetUser, GetAllTournaments } from '../../../utils';
 
 export default function Deleted({ socketId, username, isAdmin, changeUrl }) {
     const [isLoading, setIsLoading] = useState(true);
     const [tournaments, setTournaments] = useState([]);
 
     async function loadTournaments() {
-        const result = await AdminGetAllTournaments(socketId, 'deleted')
+        const result = await GetAllTournaments(socketId, 'deleted')
         if (result) {
             setTournaments(result);
             setIsLoading(false);

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { GetUser, CreateTournament } from '../../../utils';
 
-export default function Create({ socketId, username, isAdmin, changeUrl }) {
+export default function Create({ socketId, username, adminAccess, isAdmin, changeUrl }) {
     const [name, setName] = useState('');
     const [rules, setRules] = useState("Guesser determines the wager amount");
     const [tournamentType, setTournamentType] = useState("Single Elimination");
@@ -71,7 +71,7 @@ export default function Create({ socketId, username, isAdmin, changeUrl }) {
         const asyncFunc = async () => {
             if (socketId) {
                 const user = await GetUser(socketId);
-                if (!user) {
+                if (!user || !user.adminAccess || !adminAccess) {
                     changeUrl('/login');
                 }
             }

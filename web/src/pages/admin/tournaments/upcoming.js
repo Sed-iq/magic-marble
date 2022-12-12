@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Loading from '../../../components/Loading';
 
-import { GetUser, AdminGetAllTournaments, DeleteTournament } from '../../../utils';
+import { GetUser, GetAllTournaments, DeleteTournament } from '../../../utils';
 
 export default function Upcoming({ socketId, username, isAdmin, changeUrl }) {
     const [isLoading, setIsLoading] = useState(true);
@@ -20,7 +20,7 @@ export default function Upcoming({ socketId, username, isAdmin, changeUrl }) {
     }
 
     async function loadTournaments() {
-        const result = await AdminGetAllTournaments(socketId, 'upcoming')
+        const result = await GetAllTournaments(socketId, 'upcoming')
         if (result) {
             setTournaments(result);
             setIsLoading(false);

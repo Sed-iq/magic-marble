@@ -8,6 +8,10 @@ const tournamentSchema = new  mongoose.Schema({
         required: true,
         trim: true
     },
+    createdBy: {
+        type: String,
+        required: true,
+    },
     name: String,
     status: String, // upcoming or live or completed or deleted
     rules: String,

@@ -10,8 +10,7 @@ const { initServer } = require('./tournaments/tournaments.js');
 
 const { register, login, updateUser, deleteUser, getUser, getAllPlayers, createTournament,
     updateTournament, deleteTournament, joinTournament, leaveTournament, getTournament,
-    getAllTournaments, getAdminDashboardData, getPlayerDashboardData, getTournamentsForPlayer,
-    getPlayerTournaments } = require('./actions/actions.js');
+    getAllTournaments, getAdminDashboardData, getPlayerDashboardData, getPlayerTournaments, updateUserAdminAccess, getUserWithUserId } = require('./actions/actions.js');
 
 
 // app config
@@ -50,11 +49,18 @@ app.post('/login', login);
 // update username of user
 app.post('/updateUser', updateUser);
 
+// update username of user
+app.post('/updateUserAdminAccess', updateUserAdminAccess);
+
 // delete account of user
 app.post('/deleteUser', deleteUser);
 
 // get a user
 app.get('/getUser', getUser);
+
+// get a user
+app.get('/getUserWithUserId', getUserWithUserId);
+
 
 // get all players except admin
 app.get('/getAllPlayers', getAllPlayers);
@@ -79,9 +85,6 @@ app.get('/getTournament', getTournament);
 
 // get all tournaments
 app.get('/getAllTournaments', getAllTournaments);
-
-// get tournaments for player
-app.get('/getTournamentsForPlayer', getTournamentsForPlayer);
 
 // get player tournaments
 app.get('/getPlayerTournaments', getPlayerTournaments);

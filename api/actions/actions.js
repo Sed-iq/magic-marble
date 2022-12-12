@@ -739,29 +739,28 @@ const getPlayerDashboardData = (req, res) => {
         if (user.isAdmin) {
             return res.status(400).json({ error: 'User is an admin' });
         }
-        let playedTournaments = 0;
-        let wonTournaments = 0;
-        let joinedTournaments = 0;
-        let liveTournaments = 0;
-        Tournament.find({ playersArr: { $in: [userId] } }, (err, tournaments) => {
+        let myTournaments = 0;
+        let createdTournaments = 0;
+        let upcomingTournaments = 0;
+        Tournament.find({ status: { $ne: 'completed' } }, (err, tournaments) => {
             if (err) {
                 return res.status(500).json({ error: err._message });
             }
             tournaments.forEach(tournament => {
                 if (tournament.status === 'upcoming') {
-                    joinedTournaments++;
+                    upcomingTournaments++;
                 }
-                if (tournament.status === 'live') {
-                    liveTournaments++;
+                if (tournament.status === 'upcoming' && tournament.playersArr.includes(userId)) {
+                    myTournaments++;
                 }
-                if (tournament.status === 'completed') {
-                    playedTournaments++;
-                    if (tournament.winnerId === userId) {
-                        wonTournaments++;
-                    }
+                if (tournament.status === 'live' && tournament.playersArr.includes(userId)) {
+                    myTournaments++;
+                }
+                if (tournament.createdBy === userId) {
+                    createdTournaments++;
                 }
             });
-            return res.status(200).json({ playedTournaments: playedTournaments, wonTournaments: wonTournaments, joinedTournaments: joinedTournaments, liveTournaments: liveTournaments });
+            return res.status(200).json({ myTournaments: myTournaments, upcomingTournaments: upcomingTournaments, createdTournaments: createdTournaments, wallet: user.wallet });
         });
     });
 }

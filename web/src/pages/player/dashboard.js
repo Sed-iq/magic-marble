@@ -3,19 +3,19 @@ import React, { useState, useEffect } from 'react';
 import { GetUser, GetPlayerDashboardData } from '../../utils';
 
 export default function Dashboard({ socketId, username, isAdmin, changeUrl }) {
-    const [playedTournaments, setPlayedTournaments] = useState(0);
-    const [wonTournaments, setWonTournaments] = useState(0);
-    const [joinedTournaments, setJoinedTournaments] = useState(0);
-    const [liveTournaments, setLiveTournaments] = useState(0);
+    const [myTournaments, setMyTournaments] = useState(0);
+    const [upcomingTournaments, setUpcomingTournaments] = useState(0);
+    const [createdTournaments, setCreatedTournaments] = useState(0);
+    const [wallet, setWallet] = useState(0);
 
     async function loadData() {
         const result = await GetPlayerDashboardData(socketId);
         if (result !== null) {
             if (result) {
-                setPlayedTournaments(result.playedTournaments);
-                setWonTournaments(result.wonTournaments);
-                setJoinedTournaments(result.joinedTournaments);
-                setLiveTournaments(result.liveTournaments);
+                setMyTournaments(result.myTournaments);
+                setUpcomingTournaments(result.upcomingTournaments);
+                setCreatedTournaments(result.createdTournaments);
+                setWallet(result.wallet);
             }
         }
         else {
@@ -59,7 +59,7 @@ export default function Dashboard({ socketId, username, isAdmin, changeUrl }) {
                                 My Tournaments
                             </p>
                             <p className="text-lg font-semibold text-gray-200 transition-all">
-                                {playedTournaments}
+                                {myTournaments}
                             </p>
                         </div>
                     </div>
@@ -76,7 +76,7 @@ export default function Dashboard({ socketId, username, isAdmin, changeUrl }) {
                                 Upcoming Tournaments
                             </p>
                             <p className="text-lg font-semibold text-gray-200 transition-all">
-                                {joinedTournaments}
+                                {upcomingTournaments}
                             </p>
                         </div>
                     </div>
@@ -92,7 +92,7 @@ export default function Dashboard({ socketId, username, isAdmin, changeUrl }) {
                                 Create new Tournaments
                             </p>
                             <p className="text-lg font-semibold text-gray-200 transition-all">
-                                {joinedTournaments}
+                                {createdTournaments}
                             </p>
                         </div>
                     </div>
@@ -107,7 +107,7 @@ export default function Dashboard({ socketId, username, isAdmin, changeUrl }) {
                                 My Wallet
                             </p>
                             <p className="text-lg font-semibold text-gray-200 transition-all">
-                                {liveTournaments}
+                                {wallet}
                             </p>
                         </div>
                     </div>

@@ -52,12 +52,12 @@ export default function Login({ socketId }) {
         const asyncFunc = async () => {
             await loadUser();
         }
-        asyncFunc();
+        // asyncFunc();
     }, [socketId]);
 
     return (
         <div className="flex items-center min-h-screen p-6 bg-gray-900">
-            <div className="flex-1 h-full max-w-2xl mx-auto overflow-hidden rounded-lg shadow-xl bg-gray-800">
+            <div className="flex-1 h-full max-w-2xl mx-auto overflow-hidden">
                 <div className="flex flex-col overflow-y-auto">
                     <div className="flex items-center justify-center p-6 sm:p-12">
                         <form onSubmit={handleSubmit} className="w-full">

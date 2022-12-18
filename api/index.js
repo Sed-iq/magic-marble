@@ -3,20 +3,18 @@ const bodyParser = require("body-parser");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const cors = require('cors');
+const passport = require("passport");
+const cookieSession = require("cookie-session");
+const PasswordStrategy = require("./passport/passport");
 
 const connectDB = require('./database/mongoose.js');
 
 const { initServer } = require('./tournaments/tournaments.js');
 
-const { register, login, updateUser, deleteUser, getUser, getAllPlayers, createTournament,
+const {Google, GoogleCallback, signup, login, updateUser, deleteUser, getUser, getAllPlayers, createTournament,
     updateTournament, deleteTournament, joinTournament, leaveTournament, getTournament,
     getAllTournaments, getAdminDashboardData, getPlayerDashboardData, getPlayerTournaments, updateUserAdminAccess, getUserWithUserId } = require('./actions/actions.js');
 
-
-// app config
-const app = express();
-app.use(cors());
-app.use(bodyParser.json());
 
 const PORT = process.env.PORT || 5500;
 
@@ -24,6 +22,29 @@ const PORT = process.env.PORT || 5500;
 const WEB_URL = "https://squid-app-mtjl8.ondigitalocean.app";
 const CONN_URL = 'mongodb+srv://tajammal:FtSTFcuiutGj5A6y@marblesdbcluster.w7hc4a9.mongodb.net/?retryWrites=true&w=majority';
 
+
+// app config
+const app = express();
+
+app.use(cors({
+    origin: WEB_URL,
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
+}
+));
+
+app.use(bodyParser.json());
+
+app.use(
+    cookieSession({
+        name: "session",
+        keys: ["cyberwolve"],
+        maxAge: 24 * 60 * 60 * 100,
+    })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // connect socket.io client
 const httpServer = createServer(app);
@@ -33,6 +54,7 @@ const io = new Server(httpServer, {
         methods: ["GET", "POST"]
     }
 });
+
 // init game server
 initServer(io);
 
@@ -40,8 +62,14 @@ initServer(io);
 connectDB(CONN_URL);
 
 
-// register
-app.post('/register', register);
+// google
+app.get('/auth/google', Google);
+
+// google/callback
+app.get('/auth/google/callback', GoogleCallback);
+
+// signup
+app.post('/signup', signup);
 
 // login
 app.post('/login', login);

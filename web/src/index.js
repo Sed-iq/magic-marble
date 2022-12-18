@@ -10,7 +10,7 @@ import './index.css';
 
 import Home from './pages/index';
 import Login from './pages/login';
-import Register from './pages/register';
+import SignUp from './pages/signup';
 import Error from './pages/error';
 
 import Admin from './pages/admin/admin';
@@ -56,7 +56,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home socketId={socketId} />} />
         <Route path="/login" element={<Login socketId={socketId} />} />
-        <Route path="/register" element={<Register socketId={socketId} />} />
+        <Route path="/signup" element={<SignUp socketId={socketId} />} />
         <Route path="/admin/*" element={<Admin socketId={socketId} />} />
         <Route path="/player/*" element={<Player socketId={socketId} />} />
         <Route path="/games/magicmarble" element={<MagicMarble socketId={socketId} socket={socket} />} />

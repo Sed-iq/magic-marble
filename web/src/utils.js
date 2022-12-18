@@ -53,22 +53,27 @@ const GetUserWithUserId = async (socketId, userId) => {
     return null;
 }
 
-const RegisterUser = async (username, password, confirmPassword) => {
-    if (!username || !password || !confirmPassword) {
-        alert('Please enter username and password');
+const SignUpUser = async (username, email, password) => {
+    if (!username || !email || !password) {
+        alert('Please enter username, email and password');
         return;
     }
-    if (password !== confirmPassword) {
-        alert('Passwords do not match');
+    if (!String(email)
+        .toLowerCase()
+        .match(
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        )) {
+        alert('Please enter a valid email address');
         return;
     }
-    const response = await fetch(`${API_URL}/register`, {
+    const response = await fetch(`${API_URL}/signup`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             username: username,
+            email: email,
             password: password
         })
     });
@@ -82,9 +87,9 @@ const RegisterUser = async (username, password, confirmPassword) => {
     }
 }
 
-const LoginUser = async (username, password) => {
-    if (username === '' || password === '') {
-        alert('Please enter username and password');
+const LoginUser = async (email, password) => {
+    if (!email || !password) {
+        alert('Please enter email and password');
         return;
     }
     const response = await fetch(`${API_URL}/login`, {
@@ -93,7 +98,7 @@ const LoginUser = async (username, password) => {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            username: username,
+            email: email,
             password: password
         })
     });
@@ -258,7 +263,7 @@ const CreateTournament = async (socketId, name, description, rules, tournamentTy
                 return false;
             }
         }
-        else{
+        else {
             alert('You must be an admin or have admin access to create a tournament');
             return null;
         }
@@ -590,7 +595,7 @@ export {
     API_URL,
     WEB_URL,
     GetUser,
-    RegisterUser,
+    SignUpUser,
     LoginUser,
     UpdateUser,
     UpdateUserAdminAccess,

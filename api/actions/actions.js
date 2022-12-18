@@ -8,6 +8,7 @@
 
 const crypto = require('../crypto/crypto');
 const jwt = require('jsonwebtoken');
+const passport = require('passport');
 
 const { addSocket, removeSocketsWithUserId, addUpcomingTournament,
     updateUpcomingTournament, removeUpcomingTournament,
@@ -19,15 +20,37 @@ const User = require('../models/user');
 
 const JWT_SECRET = "IamSECRET";
 
+
+const Google = (req, res) => {
+    passport.authenticate("google",["profile", "email"])
+    console.log("Google");
+};
+
+const GoogleCallback = (req, res) => {
+    passport.authenticate("google", {
+        successRedirect: "https://squid-app-mtjl8.ondigitalocean.app/player/dashbaord",
+        failureRedirect: "https://squid-app-mtjl8.ondigitalocean.app/login",
+    })
+    console.log("Google Callback");
+};
+
 // register
-const register = (req, res) => {
-    let { username, password } = req.body;
-    User.findOne({ username: username }, (err, user) => {
+const signup = (req, res) => {
+    let { username, email, password } = req.body;
+    User.findOne({ $or: [{ username: username, email: email }] }, (err, user) => {
         if (err) {
             return res.status(500).json({ error: err._message });
         }
         if (user) {
-            return res.status(400).json({ error: 'Username already exists' });
+            return res.status(400).json({ error: 'Username or Email already exists' });
+        }
+        // check valid email or not
+        if (!String(email)
+            .toLowerCase()
+            .match(
+                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            )) {
+            return res.status(400).json({ error: 'Email is not valid' });
         }
         let id = 0;
         User.find({}, (err, users) => {
@@ -40,6 +63,7 @@ const register = (req, res) => {
             const newUser = new User({
                 id: crypto.encrypt(id.toString()),
                 username: username,
+                email: email,
                 password: crypto.encrypt(password.toString()),
                 isAdmin: false,
                 total: 0,
@@ -62,16 +86,19 @@ const register = (req, res) => {
 
 // login
 const login = (req, res) => {
-    let { username, password } = req.body;
-    User.findOne({ username: username }, (err, user) => {
+    let { email, password } = req.body;
+    User.findOne({ email: email }, (err, user) => {
         if (err) {
             return res.status(500).json({ error: err._message });
         }
         if (!user) {
-            return res.status(400).json({ error: 'Username does not exist' });
+            return res.status(400).json({ error: 'Email does not exist' });
         }
         if (user.status === 'inactive') {
             return res.status(400).json({ error: 'Your account has been deleted' });
+        }
+        if (user.signupby === 'google') {
+            return res.status(400).json({ error: 'You have signed up with google' });
         }
         // decrypt password
         const decryptedPassword = crypto.decrypt(user.password);
@@ -279,6 +306,7 @@ const getAllPlayers = (req, res) => {
                 const tournaments = await Tournament.find({ status: 'completed', winnerId: user.id });
                 let userWithoutPassword = {
                     id: user.id,
+                    email: user.email,
                     username: user.username,
                     tournamentsArr: user.tournamentsArr,
                     wins: tournaments.length,
@@ -767,7 +795,9 @@ const getPlayerDashboardData = (req, res) => {
 
 // exports
 module.exports = {
-    register,
+    Google,
+    GoogleCallback,
+    signup,
     login,
     updateUser,
     updateUserAdminAccess,

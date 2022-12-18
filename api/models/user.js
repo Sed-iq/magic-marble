@@ -8,13 +8,14 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    email:{
-        type: String,
-    },
-    username: {
+    email: {
         type: String,
         unique: true,
         required: true,
+        trim: true
+    },
+    username: {
+        type: String,
     },
     password: {
         type: String,
@@ -27,6 +28,10 @@ const userSchema = new mongoose.Schema({
     adminAccess: {
         type: Boolean,
         default: true
+    },
+    signupby: {
+        type: String,
+        default: 'email'
     },
     isAdmin: Boolean,
     createDateTime: String,

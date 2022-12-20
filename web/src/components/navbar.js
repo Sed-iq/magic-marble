@@ -21,6 +21,24 @@ export default function Navbar({ socket, sideBarOpen, toggleSideBar, changeUrl }
                 <div className="lg:mr-32"></div>
                 <ul className="flex items-center flex-shrink-0 space-x-6">
                     <li className="relative">
+                        {/* select with crypto to select */}
+                        <select className="rounded-md bg-transparent focus:outline-none focus:shadow-outline-purple">
+                            {/* with its logo */}
+                            <option value="bitcoin">
+                                Bitcoin
+                            </option>
+                        </select>
+                    </li>
+                    <li className="relative">
+                        {/* show wallet with logo */}
+                        <i className="w-5 h-5 fa-solid fa-wallet"></i>
+                        0
+                    </li>
+                    <li className="relative">
+                        {/* show wallet ballance */}
+
+                    </li>
+                    <li className="relative">
                         {(socket) ? <i className="w-5 h-5 fa-solid fa-wifi"></i> : <i className="w-5 h-5 fa-solid fa-wifi-slash"></i>}
                     </li>
                     <li className="relative">

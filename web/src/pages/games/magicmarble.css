@@ -18,10 +18,6 @@
   src: url(/public/fonts/Cantarell/Cantarell-Regular.ttf);
 }
 
-body {
-  background-color: #0e1232;
-}
-
 #app {
   background-color: #0e1232;
   margin: 0px;

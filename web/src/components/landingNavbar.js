@@ -6,14 +6,10 @@ export default function LandingNavbar() {
 
     return (
         <>
-            <div className="flex items-center justify-between h-16 px-4 py-2 border-b-2 border-white bg-black">
+            <div className="font-sgl flex items-center justify-between h-16 px-4 py-2 border-b-2 border-[#292524] bg-black">
                 <div className='flex items-center'>
                     <Link to='/'>
-                        <svg className='w-12 h-12' width="304" height="303" viewBox="0 0 304 303" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle className="text-[#6d00cc]" cx="152.5" cy="151.5" r="151.5" fill="currentColor" />
-                            <path d="M161 71.5C146.2 53.9 25 71.9323 19 79C-2.5 114.5 5.04851e-05 152 1.50004 167C20.5 151.5 110 105 137 112C152.5 124 142 174.5 165.5 187C193.5 201.5 216.5 143.041 234.5 144.5C252.5 145.959 267.5 250 267.5 250C267.5 250 280 234.833 281.5 231.5C274.5 168 259.5 117.5 239 112C218.5 106.5 188.5 156.5 176 149C163.5 141.5 181.5 86 161 71.5Z" fill="currentColor" />
-                            <path d="M141.5 206C103.9 188.8 38.1667 197.5 10 204C14.8333 219.167 26.5 248.7 34.5 245.5C60.155 235.238 104.5 233.5 127.5 241.242C150.5 248.984 182.436 267.489 190 298.5C203.5 303.5 228.3 308.2 219.5 287C208.5 260.5 188.5 227.5 141.5 206Z" fill="currentColor" />
-                        </svg>
+                        <img className="w-10 h-10 bg-gradient-to-r from-[#f0f] to-[#6d00cc] rounded-full" src="/images/Logo group.svg"></img>
                     </Link>
                     <p className='text-white mx-2 font-bold'>MAGIC <br></br> MARBLE</p>
                 </div>
@@ -33,14 +29,14 @@ export default function LandingNavbar() {
                 </div>
                 <div className='flex items-center align-middle gap-2'>
                     <Link className='my-auto' to='/login'>
-                        <button className='my-auto bg-[#292524] text-white px-4 py-2 rounded-lg'>Login</button>
+                        <button className='font-sgm my-auto bg-[#292524] text-white px-4 py-2 rounded-lg'>Login</button>
                     </Link>
                     <Link to='/signup'>
-                        <button className='my-auto bg-gradient-to-r from-[#f0f] to-[#6d00cc] text-white px-6 py-2 rounded-lg'>Sign Up</button>
+                        <button className='font-sgm my-auto bg-gradient-to-r from-[#f0f] to-[#6d00cc] text-white px-6 py-2 rounded-lg'>Play for free</button>
                     </Link>
                 </div>
             </div>
-            <div className="fixed w-full bottom-0 flex lg:hidden justify-center py-2 bg-black border-white border-t-2 items-center text-center text-white gap-1 md:gap-4 text-xs md:text-sm">
+            <div className="font-sgb fixed w-full bottom-0 flex lg:hidden justify-center py-2 bg-black border-[#292524] border-t-2 items-center text-center text-white gap-1 md:gap-4 text-xs md:text-sm z-50">
                 <HashLink smooth className='my-auto font-bold' to='/#howitworks'>
                     <svg className="w-6 h-6 mx-auto" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M6,2A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6M6,4H13V9H18V20H6V4M8,12V14H16V12H8M8,16V18H13V16H8Z"></path>

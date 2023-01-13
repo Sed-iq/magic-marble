@@ -13,14 +13,17 @@ export default function Home({ socket }) {
                     </video>
                     <div className='absolute inset-0 grid place-content-center'>
                         <div className='text-white text-center space-y-4 lg:space-y-10'>
-                            <h1 className='font-bold text-2xl md:text-4xl lg:text-5xl'>The fastest 100X you'll ever make</h1>
-                            <p className='text-xm md:text-xl lg:text-3xl'>No whales, no bots, no insiders. Only the moonshot you've been waiting for.</p>
-                            <button className='text-sm md:text-xl lg:text-2xl my-auto bg-gradient-to-r from-[#f0f] to-[#6d00cc] text-white px-4 py-2 lg:px-8 lg:py-4 rounded-xl font-semibold'>Play for free</button>
+                            <h1 className='font-sgb font-bold text-2xl md:text-4xl lg:text-5xl'>The fastest 100X you'll ever make</h1>
+                            <p className='font-sgl text-xm md:text-xl lg:text-3xl'>No whales, no bots, no insiders. Only the moonshot you've been waiting for.</p>
+                            <br></br>
+                            <Link to='/signup'>
+                                <button className='font-sgb text-sm md:text-xl lg:text-2xl my-auto bg-gradient-to-r from-[#f0f] to-[#6d00cc] text-white px-4 py-2 lg:px-8 lg:py-4 rounded-xl font-semibold'>Play for free</button>
+                            </Link>
                         </div>
                     </div>
                 </div>
-                <div id='howitworks' className='px-4 md:px-10 lg:px-32 py-24 text-xl lg:text-2xl'>
-                    <h1 className='text-4xl lg:text-5xl font-bold mb-6 lg:mb-8'>
+                <div id='howitworks' className='font-sgl px-4 md:px-10 lg:px-32 py-24 text-xl lg:text-2xl'>
+                    <h1 className='font-sgb text-4xl lg:text-5xl font-bold mb-6 lg:mb-8'>
                         How it works
                     </h1>
                     <p className='my-6'>
@@ -42,39 +45,39 @@ export default function Home({ socket }) {
                         Magic Marble is on a mission is to unlock this opportunity for everyone.
                     </p>
                 </div>
-                <div className='px-4 md:px-10 lg:px-32 py-24 bg-[#d1d5db] text-black text-xl lg:text-2xl'>
-                    <h1 className='font-semibold text-4xl lg:text-5xl pb-4'>
+                <div className='font-sgl px-4 md:px-10 lg:px-32 py-24 bg-[#d1d5db] text-black text-xl lg:text-2xl'>
+                    <h1 className='font-sgb font-semibold text-4xl lg:text-5xl pb-4'>
                         Key advantages
                     </h1>
                     <ul className='pl-12 list-outside list-disc space-y-2 py-2'>
                         <li>
-                            <h2 className='font-semibold'>Incredible Gains</h2>
+                            <h2 className='font-sgm font-semibold'>Incredible Gains</h2>
                             <p>Make 10x-100x or even 1000x your investment.</p>
                         </li>
                         <li>
-                            <h2 className='font-semibold'>Warp speed</h2>
+                            <h2 className='font-sgm font-semibold'>Warp speed</h2>
                             <p>100x in crypto is rare but possible. 100x in a couple of hours? Insane.</p>
                         </li>
                         <li>
-                            <h2 className='font-semibold'>Affordable to anyone</h2>
+                            <h2 className='font-sgm font-semibold'>Affordable to anyone</h2>
                             <p>Participate for as little as 50$.</p>
                         </li>
                         <li>
-                            <h2 className='font-semibold'>Equal chances</h2>
+                            <h2 className='font-sgm font-semibold'>Equal chances</h2>
                             <p>Play against your equals, not against the house.</p>
                         </li>
                         <li>
-                            <h2 className='font-bold'>Transparency</h2>
+                            <h2 className='font-sgm font-bold'>Transparency</h2>
                             <p>Clear and simple rules, no cheating, no rug pulls.</p>
                         </li>
                         <li>
-                            <h2 className='font-semibold'>Fair distribution</h2>
+                            <h2 className='font-sgm font-semibold'>Fair distribution</h2>
                             <p>97% of funds go towards the prize fund.</p>
                         </li>
                     </ul>
                 </div>
-                <div id='nftfreeroll' className='text-center px-4 md:px-10 lg:px-32 py-24 text-xl lg:text-2xl'>
-                    <h1 className='text-4xl lg:text-5xl font-bold'>
+                <div id='nftfreeroll' className='font-sgl text-center px-4 md:px-10 lg:px-32 py-24 text-xl lg:text-2xl'>
+                    <h1 className='font-sgb text-4xl lg:text-5xl font-bold'>
                         Genesis 🔥NFT Freeroll
                     </h1>
                     <p className='my-4'>
@@ -95,16 +98,16 @@ export default function Home({ socket }) {
                     <p className='mx-auto my-6 w-fit rounded-xl border-white border px-3 py-2 lg:py-4 lg:px-6'>
                         Exclusive rights to create your own custom tournaments and earn rewards.
                     </p>
-                    <button className='text-xl md:text-2xl my-auto bg-gradient-to-r from-[#f0f] to-[#6d00cc] text-white px-4 py-2 lg:px-8 lg:py-4 rounded-xl font-semibold'>
+                    <button className='font-sgb text-xl md:text-2xl my-auto bg-gradient-to-r from-[#f0f] to-[#6d00cc] text-white px-4 py-2 lg:px-8 lg:py-4 rounded-xl font-semibold'>
                         Free whitelist spot
                     </button>
                 </div>
-                <div className='px-4 md:px-10 lg:px-32 py-24 bg-[#d1d5db] text-black text-xl lg:text-2xl'>
-                    <h1 className='text-4xl lg:text-5xl font-bold mb-16'>
+                <div className='font-sgl px-4 md:px-10 lg:px-32 py-24 bg-[#d1d5db] text-black text-xl lg:text-2xl'>
+                    <h1 className='font-sgb text-4xl lg:text-5xl font-bold mb-16'>
                         Roadmap
                     </h1>
                     <div className='my-8'>
-                        <h2 className='text-2xl lg:text-3xl font-semibold mb-4'>
+                        <h2 className='font-sgm text-2xl lg:text-3xl font-semibold mb-4'>
                             Crowdfund
                         </h2>
                         <p>
@@ -112,7 +115,7 @@ export default function Home({ socket }) {
                         </p>
                     </div>
                     <div className='my-8'>
-                        <h2 className='text-2xl lg:text-3xl font-semibold mb-4'>
+                        <h2 className='font-sgm text-2xl lg:text-3xl font-semibold mb-4'>
                             Presale
                         </h2>
                         <p>
@@ -120,7 +123,7 @@ export default function Home({ socket }) {
                         </p>
                     </div>
                     <div className='my-8'>
-                        <h2 className='text-2xl lg:text-3xl font-semibold mb-4'>
+                        <h2 className='font-sgm text-2xl lg:text-3xl font-semibold mb-4'>
                             Public sale
                         </h2>
                         <p>
@@ -128,7 +131,7 @@ export default function Home({ socket }) {
                         </p>
                     </div>
                     <div className='my-8'>
-                        <h2 className='text-2xl lg:text-3xl font-semibold mb-4'>
+                        <h2 className='font-sgm text-2xl lg:text-3xl font-semibold mb-4'>
                             Let the game begin!
                         </h2>
                         <p>
@@ -136,8 +139,8 @@ export default function Home({ socket }) {
                         </p>
                     </div>
                 </div>
-                <div id='aboutus' className='px-4 md:px-10 lg:px-32 py-24 text-xl lg:text-2xl'>
-                    <h1 className='text-4xl lg:text-5xl font-bold'>
+                <div id='aboutus' className='font-sgl px-4 md:px-10 lg:px-32 py-24 text-xl lg:text-2xl'>
+                    <h1 className='font-sgm text-4xl lg:text-5xl font-bold'>
                         Meet our team
                     </h1>
                     <p className='my-4'>
@@ -146,22 +149,22 @@ export default function Home({ socket }) {
                     <div className='w-full h-full my-8 grid gap-24 grid-cols-1 lg:grid-cols-2'>
                         <div className='text-center'>
                             <img src='/images/logo4.png' alt='alex' className='w-40 h-40 md:w-64 md:h-64 rounded-full mx-auto' />
-                            <h2 className='font-bold my-2'>Marblemaster</h2>
+                            <h2 className='font-sgm font-bold my-2'>Marblemaster</h2>
                             <p className='my-2'>Game theory geek / software developer</p>
                         </div>
                         <div className='text-center'>
                             <img src='/images/df.jpg' alt='alex' className='w-40 h-40 md:w-64 md:h-64 rounded-full mx-auto' />
-                            <h2 className='font-bold my-2'>D.Forrest</h2>
+                            <h2 className='font-sgm font-bold my-2'>D.Forrest</h2>
                             <p className='my-2'>Art Designer / NFT expert</p>
                         </div>
                         <div className='text-center'>
                             <img src='/images/tm.jpg' alt='alex' className='w-40 h-40 md:w-64 md:h-64 rounded-full mx-auto' />
-                            <h2 className='font-bold my-2'>T.M.</h2>
+                            <h2 className='font-sgm font-bold my-2'>T.M.</h2>
                             <p className='my-2'>Fullstack developer</p>
                         </div>
                         <div className='text-center'>
                             <img src='/images/ak.jpg' alt='alex' className='w-40 h-40 md:w-64 md:h-64 rounded-full mx-auto' />
-                            <h2 className='font-bold my-2'>A.Khan</h2>
+                            <h2 className='font-sgm font-bold my-2'>A.Khan</h2>
                             <p className='my-2'>Frontend developer</p>
                         </div>
                     </div>

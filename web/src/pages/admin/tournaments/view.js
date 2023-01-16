@@ -85,13 +85,22 @@ export default function View({ socketId, username, isAdmin, changeUrl }) {
 
                                 <div className="grid md:grid-cols-2 justify-between mt-4">
                                     <span className="text-sm font-light text-gray-400">
-                                        <li className="fas fa-users mr-2"></li> Add Buy-in
+                                        <li className="fas fa-users mr-2"></li> Current Players
                                     </span>
                                     <span
                                         className="px-2 py-1 font-semibold rounded shadow bg-gray-600 text-gray-200">
                                         <span >{tournament && tournament.playersArr ? tournament.playersArr.length : '0'}</span>
                                         /
                                         <span id="maxPlayers">{tournament && tournament.maxPlayers ? tournament.maxPlayers : '0'}</span>
+                                    </span>
+                                </div>
+                                <div className="grid md:grid-cols-2 justify-between mt-4">
+                                    <span className="text-sm font-light text-gray-400">
+                                        <i class="fas fa-dollar-sign mr-2"></i> Add Buy-in
+                                    </span>
+                                    <span
+                                        className="px-2 py-1 font-semibold rounded shadow bg-gray-600 text-gray-200">
+                                        <span >0</span>
                                     </span>
                                 </div>
                                 <div className="grid md:grid-cols-2 justify-between mt-4">

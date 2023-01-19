@@ -2,17 +2,17 @@
 
 @font-face {
   font-family: SGL;
-  src: url(./landing-page/Resources/fonts/spacegrotesk/SpaceGrotesk-Light.otf);
+  src: url(/public/fonts/spacegrotesk/SpaceGrotesk-Light.otf);
 }
 
 @font-face {
   font-family: SGM;
-  src: url(./landing-page/Resources/fonts/spacegrotesk/SpaceGrotesk-Medium.otf);
+  src: url(/public/fonts/spacegrotesk/SpaceGrotesk-Medium.otf);
 }
 
 @font-face {
   font-family: SGB;
-  src: url(./landing-page/Resources/fonts/spacegrotesk/SpaceGrotesk-Bold.otf);
+  src: url(/public/fonts/spacegrotesk/SpaceGrotesk-Bold.otf);
 }
 
 html {
@@ -140,9 +140,6 @@ header {
   color: #fafaf9;
   font-size: 1rem;
 }
-
-
-
 
 /*Header mobile styling*/
 @media (max-width: 1200px) {

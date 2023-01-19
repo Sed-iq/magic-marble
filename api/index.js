@@ -3,22 +3,20 @@ const bodyParser = require("body-parser");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const cors = require('cors');
-const passport = require("passport");
-const cookieSession = require("cookie-session");
-const PasswordStrategy = require("./passport/passport");
 
 const connectDB = require('./database/mongoose.js');
 
 const { initServer } = require('./tournaments/tournaments.js');
 
-const {Google, GoogleCallback, signup, login, updateUser, deleteUser, getUser, getAllPlayers, createTournament,
-    updateTournament, deleteTournament, joinTournament, leaveTournament, getTournament,
-    getAllTournaments, getAdminDashboardData, getPlayerDashboardData, getPlayerTournaments, updateUserAdminAccess, getUserWithUserId } = require('./actions/actions.js');
+const { signup, login, updateUser, deleteUser, getUser, getAllPlayers, createTournament,
+    updateTournament, deleteTournament, joinTournament, leaveTournament, addBetToTournament, getTournament,
+    getAllTournaments, getAdminDashboardData, getPlayerDashboardData, getPlayerTournaments, updateUserAdminAccess,
+    getUserWithUserId, addMessageToTournament, getLiveTournamentDetails } = require('./actions/actions.js');
 
 
 const PORT = process.env.PORT || 5500;
 
-const WEB_URL = 'http://localhost:3000';
+// const WEB_URL = 'http://localhost:3000';
 // const WEB_URL = "https://squid-app-mtjl8.ondigitalocean.app";
 const CONN_URL = 'mongodb+srv://tajammal:FtSTFcuiutGj5A6y@marblesdbcluster.w7hc4a9.mongodb.net/?retryWrites=true&w=majority';
 
@@ -27,7 +25,7 @@ const CONN_URL = 'mongodb+srv://tajammal:FtSTFcuiutGj5A6y@marblesdbcluster.w7hc4
 const app = express();
 
 app.use(cors({
-    origin: WEB_URL,
+    origin: "*",
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
 }
@@ -35,22 +33,11 @@ app.use(cors({
 
 app.use(bodyParser.json());
 
-app.use(
-    cookieSession({
-        name: "session",
-        keys: ["cyberwolve"],
-        maxAge: 24 * 60 * 60 * 100,
-    })
-);
-
-app.use(passport.initialize());
-app.use(passport.session());
-
 // connect socket.io client
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
-        origin: WEB_URL,
+        origin: "*",
         methods: ["GET", "POST"]
     }
 });
@@ -61,12 +48,6 @@ initServer(io);
 // connect database
 connectDB(CONN_URL);
 
-
-// google
-app.get('/auth/google', Google);
-
-// google/callback
-app.get('/auth/google/callback', GoogleCallback);
 
 // signup
 app.post('/signup', signup);
@@ -89,7 +70,6 @@ app.get('/getUser', getUser);
 // get a user
 app.get('/getUserWithUserId', getUserWithUserId);
 
-
 // get all players except admin
 app.get('/getAllPlayers', getAllPlayers);
 
@@ -107,6 +87,15 @@ app.post('/joinTournament', joinTournament);
 
 // leave tournament
 app.post('/leaveTournament', leaveTournament);
+
+// add bet to tournament
+app.post('/addBetToTournament', addBetToTournament);
+
+// add message to tournament
+app.post('/addMessageToTournament', addMessageToTournament);
+
+// get live tournament details
+app.get('/getLiveTournamentDetails', getLiveTournamentDetails);
 
 // get a tournament
 app.get('/getTournament', getTournament);

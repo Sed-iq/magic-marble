@@ -8,11 +8,10 @@
 
 const crypto = require('../crypto/crypto');
 const jwt = require('jsonwebtoken');
-const passport = require('passport');
 
-const { addSocket, removeSocketsWithUserId, addUpcomingTournament,
+const { addSocket, addBet, addMessage, getLiveTournament, removeSocketsWithUserId, addUpcomingTournament,
     updateUpcomingTournament, removeUpcomingTournament,
-    removeCurrentTournament } = require('../tournaments/tournaments');
+    removeLiveTournament } = require('../tournaments/tournaments');
 
 // import the models
 const Tournament = require('../models/tournament');
@@ -20,19 +19,6 @@ const User = require('../models/user');
 
 const JWT_SECRET = "IamSECRET";
 
-
-const Google = (req, res) => {
-    passport.authenticate("google",["profile", "email"])
-    console.log("Google");
-};
-
-const GoogleCallback = (req, res) => {
-    passport.authenticate("google", {
-        successRedirect: "https://squid-app-mtjl8.ondigitalocean.app/player/dashbaord",
-        failureRedirect: "https://squid-app-mtjl8.ondigitalocean.app/login",
-    })
-    console.log("Google Callback");
-};
 
 // register
 const signup = (req, res) => {
@@ -158,7 +144,6 @@ const updateUserAdminAccess = (req, res) => {
         });
     });
 }
-
 
 // detete
 const deleteUser = (req, res) => {
@@ -499,6 +484,51 @@ const leaveTournament = (req, res) => {
     });
 }
 
+// add bet to tournament
+const addBetToTournament = (req, res) => {
+    let { userId, tournamentId, choice, bet } = req.body;
+    if (userId || tournamentId || choice || bet) {
+        let result = addBet({ userId, tournamentId, choice, bet });
+        if (!result) {
+            return res.status(200).json({ status: true, message: 'Bet added successfully' });
+        }
+        return res.status(400).json(result);
+    }
+    else {
+        return res.status(400).json({ status: false, message: 'Invalid request' });
+    }
+}
+
+// add message to tournament
+const addMessageToTournament = (req, res) => {
+    let { userId, tournamentId, message } = req.body;
+    if (userId && tournamentId && message) {
+        let result = addMessage({ userId, tournamentId, message });
+        if (!result) {
+            return res.status(200).json({ status: true, message: 'Message added successfully' });
+        }
+        return res.status(400).json(result);
+    }
+    else {
+        return res.status(400).json({ status: false, message: 'Invalid request' });
+    }
+}
+
+// get live tournament details
+const getLiveTournamentDetails = (req, res) => {
+    let { tournamentId, userId } = req.query;
+    if (userId && tournamentId) {
+        let result = getLiveTournament({ userId, tournamentId });
+        if (result) {
+            return res.status(200).json({ status: true, message: 'Get live tournament successfully', tournament: result });
+        }
+        return res.status(200).json({ status: false, message: 'Get live tournament not successfully', tournament: result });
+    }
+    else {
+        return res.status(400).json({ status: false, message: 'Invalid request' });
+    }
+}
+
 // update tournament
 const updateTournament = (req, res) => {
     let { tournamentId, userId, name, rules, tournamentType, maxPlayers, timePerMove, timeBetweenRounds, startDateTime, description, prizeAndDistribution, optionalLink } = req.body;
@@ -617,7 +647,7 @@ const deleteTournament = (req, res) => {
                         return res.status(400).json({ error: 'Tournament could not be deleted' });
                     }
                     removeUpcomingTournament(tournament.id);
-                    removeCurrentTournament(tournament.id);
+                    removeLiveTournament(tournament.id);
                     return res.status(200).json({ message: "Tournament deleted successfully" });
                 });
             }
@@ -795,8 +825,6 @@ const getPlayerDashboardData = (req, res) => {
 
 // exports
 module.exports = {
-    Google,
-    GoogleCallback,
     signup,
     login,
     updateUser,
@@ -808,6 +836,9 @@ module.exports = {
     createTournament,
     joinTournament,
     leaveTournament,
+    addBetToTournament,
+    addMessageToTournament,
+    getLiveTournamentDetails,
     updateTournament,
     deleteTournament,
     getTournament,

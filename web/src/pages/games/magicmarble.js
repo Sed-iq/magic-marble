@@ -222,6 +222,9 @@ function TopBar({ counterText, language, setLanguage }) {
 let myUsername = null;
 
 export default function MagicMarble({ socketId, socket }) {
+    const [, updateState] = useState();
+    const forceUpdate = React.useCallback(() => updateState({}), []);
+
     const [userId, setUserId] = useState(null);
     const [tournamentId, setTournamentId] = useState(null);
     const [playerOneUserId, setPlayerOneUserId] = useState('');
@@ -412,6 +415,7 @@ export default function MagicMarble({ socketId, socket }) {
                         setPlayerTwoScore(playerTwo.score);
                     }
                 }
+                forceUpdate();
             }
             else {
                 alert('You are OUT from this tournament now due to lose!');
@@ -432,6 +436,7 @@ export default function MagicMarble({ socketId, socket }) {
         });
         if (time !== "") {
             setBetCounterText(time);
+            forceUpdate();
         }
     }
 
@@ -454,6 +459,8 @@ export default function MagicMarble({ socketId, socket }) {
             setBetCounterText("");
             setSelectedChoice('even');
             setSelectedAmount(1);
+
+            forceUpdate();
         }
     }
 
@@ -461,6 +468,8 @@ export default function MagicMarble({ socketId, socket }) {
         if (message && playerOneUserId) {
             socket.emit('message', { tournamentId: tournamentId, userId: playerOneUserId, message: message });
             setMessage('');
+
+            forceUpdate();
         }
     }
 
@@ -553,6 +562,8 @@ export default function MagicMarble({ socketId, socket }) {
                                     if ((60 - data.seconds) <= 0) {
                                         setCounterText("");
                                     }
+
+                                    forceUpdate();
                                 }
                             }
                         });
@@ -570,6 +581,8 @@ export default function MagicMarble({ socketId, socket }) {
                                 if (data.tournament.id === tournamentId) {
                                     setBetCounterText("");
                                     setSelectedAmount(1);
+
+                                    forceUpdate();
                                 }
                             }
                         });
@@ -588,8 +601,11 @@ export default function MagicMarble({ socketId, socket }) {
                                     let { to } = data;
                                     if (to === myUsername) {
                                         setReceivedMessage(data.message);
+                                        forceUpdate();
+
                                         setTimeout(() => {
                                             setReceivedMessage("");
+                                            forceUpdate();
                                         }, 4000);
                                     }
                                 }
@@ -604,18 +620,24 @@ export default function MagicMarble({ socketId, socket }) {
                                         setWonPlayer(true);
                                         setWonAmount(data.wonAmount);
                                         setReceivedMessage(`You won ${data.wonAmount} marbles in this turn! 👍`);
+                                        forceUpdate();
+
                                         setTimeout(() => {
                                             setWonAmount(null);
                                             setReceivedMessage(null);
+                                            forceUpdate();
                                         }, 4000);
                                     }
-                                    else{
+                                    else {
                                         setWonPlayer(false);
                                         setLoseAmount(data.wonAmount);
                                         setReceivedMessage(`You lost ${data.wonAmount} marbles in this turn! 👎`);
+                                        forceUpdate();
+                                        
                                         setTimeout(() => {
                                             setLoseAmount(null);
                                             setReceivedMessage(null);
+                                            forceUpdate();
                                         }, 4000);
                                     }
                                 }
@@ -678,7 +700,7 @@ export default function MagicMarble({ socketId, socket }) {
 
     return (
         <>
-            <div className='relative w-full lg:flex lg:gap-4'>
+            <div className='relative w-full lg:flex lg:gap-4 bg-[#0e1232]'>
                 <SideBar changeUrl={changeUrl} />
                 <div className='grow'>
                     <div className='relative flex flex-col w-full lg:w-[90%] mx-auto'>

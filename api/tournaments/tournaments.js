@@ -1,17 +1,3 @@
-/*
-    Here is our Game api, THAT is the main part of the game,
-    it is responsible for the game logic and the game flow.
-
-    Important Terms used in it,
-        Tournament: A tournament is a game that has a specific number of players, and a specific time between rounds.
-        User: He can be a player or a admin. (Users table in Database)
-        Player: A player is a user that is currently playing a tournament.
-        Socket: A socket means a tab of  browser that is connected to the server.
-    One player can have multiple sockets, but one socket can only be connected to one player.
-
-    Note: I ued socket.io that helps us to communicate between the server and the client.
-*/
-
 const { getUser, setTournamentLive,
     setTournamentRoundPlayersArr, setTournamentCompleted,
     getTournament, getAllTournaments } = require("../actions/otherActions");
@@ -20,7 +6,7 @@ const { getUser, setTournamentLive,
 let io = null;
 let activeSockets = [];
 let upcomingTournaments = []; // {id, intervalId, startTime}
-let currentTournaments = []; // {id, array of players}
+let liveTournaments = []; // {id, array of players}
 let intervalsArr = []; // { tournamentId, interval }
 
 // this function will start server and called from index.js
@@ -67,43 +53,37 @@ const startTournament = async (tournamentId) => {
     let tournament = await getTournament(tournamentId);
     if (tournament && tournament.playersArr.length === tournament.maxPlayers) { // check if the tournament is exist and full
         upcomingTournaments = upcomingTournaments.filter(t => t.id !== tournamentId); // remove the tournament from upcomingTournaments
-        await addCurrentTournament(tournament); // add the tournament in currentTournaments
+        await addCurrentTournament(tournament); // add the tournament in liveTournaments
         messageToAllPlayers(tournamentId, 'notify', { tournamentId: tournamentId });
         // start counter for the tournament
         let seconds = 0;
         let counterInterval = setInterval(async () => {
             seconds++;
             if (seconds === 61) { // after 60 seconds start the game
-                if (isActiveAllPlayers(tournament)) {
-                    clearInterval(counterInterval);
-                    let index = currentTournaments.findIndex(t => t.id === tournamentId);
-                    currentTournaments[index].isStarted = true;
-                    await CreateTorunamentRound(tournamentId);
-                    // start bet time interval
-                    let timeInterval = setInterval(() => {
-                        let tournamentIndex = currentTournaments.findIndex(t => t.id === tournamentId);
-                        if (tournamentIndex !== -1) {
-                            currentTournaments[tournamentIndex].currentPlayers.forEach((player) => {
-                                if (player.no === player.playerToPlay && player.score > 0) {
-                                    let matchPlayer = currentTournaments[tournamentIndex].currentPlayers.find(p => p.userId === player.matchWith);
-                                    if (matchPlayer && matchPlayer.score > 0) {
-                                        player.betTimeSeconds++;
-                                        if (player.betTimeSeconds > currentTournaments[tournamentIndex].timePerMove) {
-                                            addBet({ tournamentId: tournamentId, userId: player.userId, choice: "even", bet: 1 });
-                                            messageToAPlayer(tournamentId, player.userId, "autoAddBet", { tournament: currentTournaments[index] })
-                                        }
+                clearInterval(counterInterval);
+                let index = liveTournaments.findIndex(t => t.id === tournamentId);
+                liveTournaments[index].isStarted = true;
+                await CreateTorunamentRound(tournamentId);
+                // start bet time interval
+                let timeInterval = setInterval(() => {
+                    let tournamentIndex = liveTournaments.findIndex(t => t.id === tournamentId);
+                    if (tournamentIndex !== -1) {
+                        liveTournaments[tournamentIndex].currentPlayers.forEach((player) => {
+                            if (player.no === player.playerToPlay && player.score > 0) {
+                                let matchPlayer = liveTournaments[tournamentIndex].currentPlayers.find(p => p.userId === player.matchWith);
+                                if (matchPlayer && matchPlayer.score > 0) {
+                                    player.betTimeSeconds++;
+                                    if (player.betTimeSeconds > liveTournaments[tournamentIndex].timePerMove) {
+                                        addBet({ tournamentId: tournamentId, userId: player.userId, choice: "even", bet: 1 });
+                                        messageToAPlayer(tournamentId, player.userId, "autoAddBet", { tournament: liveTournaments[index] })
                                     }
                                 }
-                            });
-                            messageToAllSockets(tournamentId, "betCounter", { tournament: { id: currentTournaments[tournamentIndex].id, timePerMove: currentTournaments[index].timePerMove, currentPlayers: currentTournaments[index].currentPlayers } })
-                        }
-                    }, 1000);
-                    intervalsArr.push({ tournamentId: tournamentId, interval: timeInterval });
-                }
-                else {
-                    seconds = 0;
-                    messageToAllSockets(tournamentId, "alertMessage", { result: "All players are not currently active!" });
-                }
+                            }
+                        });
+                        messageToAllSockets(tournamentId, "betCounter", { tournament: { id: liveTournaments[tournamentIndex].id, timePerMove: liveTournaments[index].timePerMove, currentPlayers: liveTournaments[index].currentPlayers } })
+                    }
+                }, 1000);
+                intervalsArr.push({ tournamentId: tournamentId, interval: timeInterval });
             }
             else {
                 messageToAllSockets(tournamentId, "counter", { seconds: seconds, tournamentId: tournamentId });
@@ -136,7 +116,7 @@ const addCurrentTournament = async (tournament) => {
         });
     });
     await setTournamentLive(tournament.id); // set the tournament to live in the database
-    currentTournaments.push({
+    liveTournaments.push({
         id: tournament.id, isStarted: false, playersArr: tournament.playersArr,
         activeSockets: [], currentPlayers: currentPlayers, roundPlayersArr: [],
         timeBetweenRounds: tournament.timeBetweenRounds, timePerMove: tournament.timePerMove,
@@ -144,29 +124,10 @@ const addCurrentTournament = async (tournament) => {
     });
 }
 
-const isActiveAllPlayers = (tournament) => {
-    if (tournament) {
-        tournament.playersArr.forEach(userId => {
-            let isFound = false;
-            let index = currentTournaments.findIndex(t => t.id === tournament.id);
-            currentTournaments[index].activeSockets.forEach(as => {
-                if (as.userId === userId) {
-                    isFound = true;
-                }
-            });
-            if (!isFound) {
-                return false;
-            }
-        });
-        return true;
-    }
-    return false;
-};
-
 const CreateTorunamentRound = async (tournamentId) => {
-    let index = currentTournaments.findIndex(t => t.id === tournamentId);
+    let index = liveTournaments.findIndex(t => t.id === tournamentId);
     if (index !== -1) {
-        let currentPlayers = currentTournaments[index].currentPlayers;
+        let currentPlayers = liveTournaments[index].currentPlayers;
         currentPlayers.forEach((player, playerIdx) => {
             while (player.matchWith === null) {
                 let randomplayerIdx = Math.floor(Math.random() * currentPlayers.length);
@@ -212,17 +173,17 @@ const CreateTorunamentRound = async (tournamentId) => {
                 }
             }
         });
-        currentTournaments[index].currentPlayers = currentPlayers;
+        liveTournaments[index].currentPlayers = currentPlayers;
         let roundPlayers = [];
         currentPlayers.forEach(player => {
             if (player.isPlaying) {
                 roundPlayers.push(player.userId);
             }
         });
-        currentTournaments[index].roundPlayersArr.push(roundPlayers);
-        await setTournamentRoundPlayersArr(tournamentId, currentTournaments[index].roundPlayersArr); // update from database
+        liveTournaments[index].roundPlayersArr.push(roundPlayers);
+        await setTournamentRoundPlayersArr(tournamentId, liveTournaments[index].roundPlayersArr); // update from database
 
-        messageToAllSockets(tournamentId, "update", { tournament: currentTournaments[index] });
+        messageToAllSockets(tournamentId, "update", { tournament: liveTournaments[index] });
     }
 }
 
@@ -234,13 +195,13 @@ const decideRoles = () => {
 }
 
 const checkValidSocket = (socket, data) => {
-    let index = currentTournaments.findIndex(tournament => tournament.id === data.tournamentId);
+    let index = liveTournaments.findIndex(tournament => tournament.id === data.tournamentId);
     if (index != -1) {
-        let player = currentTournaments[index].currentPlayers.find(p => p.userId === data.userId);
+        let player = liveTournaments[index].currentPlayers.find(p => p.userId === data.userId);
         if (player) {
-            let asIndex = currentTournaments[index].activeSockets.findIndex(as => as.socketId === socket.id);
+            let asIndex = liveTournaments[index].activeSockets.findIndex(as => as.socketId === socket.id);
             if (asIndex === -1) {
-                currentTournaments[index].activeSockets.push({ socketId: socket.id, userId: data.userId });
+                liveTournaments[index].activeSockets.push({ socketId: socket.id, userId: data.userId });
             }
             asIndex = activeSockets.findIndex(as => as.socketId === socket.id);
             if (asIndex === -1) {
@@ -258,26 +219,39 @@ const checkValidSocket = (socket, data) => {
 }
 
 const updateSocket = (socket, data) => {
-    let tournament = currentTournaments.find(tour => tour.id === data.tournamentId);
+    let tournament = getLiveTournament(data);
+    if (tournament) {
+        socket.emit("update", { tournament: tournament });
+    }
+}
+
+const getLiveTournament = (data) => {
+    let tournament = liveTournaments.find(tour => tour.id === data.tournamentId);
     if (tournament) {
         let player = tournament.currentPlayers.find(p => p.userId === data.userId);
         if (player) {
             if (tournament.isStarted) {
-                socket.emit("update", { tournament: tournament });
+                return tournament;
             }
         }
+        else {
+            return null;
+        }
+    }
+    else {
+        return null;
     }
 }
 
 const addBet = async (data) => {
-    let index = currentTournaments.findIndex(t => t.id === data.tournamentId);
+    let index = liveTournaments.findIndex(t => t.id === data.tournamentId);
     if (index !== -1) {
-        let playerIdx = currentTournaments[index].currentPlayers.findIndex(p => p.userId === data.userId);
+        let playerIdx = liveTournaments[index].currentPlayers.findIndex(p => p.userId === data.userId);
         if (playerIdx !== -1) {
-            var playerOne = currentTournaments[index].currentPlayers[playerIdx];
-            let matchWithPlayerIdx = currentTournaments[index].currentPlayers.findIndex(p => p.userId === playerOne.matchWith);
+            var playerOne = liveTournaments[index].currentPlayers[playerIdx];
+            let matchWithPlayerIdx = liveTournaments[index].currentPlayers.findIndex(p => p.userId === playerOne.matchWith);
             if (matchWithPlayerIdx !== -1) {
-                var playerTwo = currentTournaments[index].currentPlayers[matchWithPlayerIdx];
+                var playerTwo = liveTournaments[index].currentPlayers[matchWithPlayerIdx];
                 playerOne.choice = data.choice;
                 playerOne.bet = data.bet;
                 playerOne.betTimeSeconds = 0;
@@ -288,11 +262,11 @@ const addBet = async (data) => {
                     let wonAmount = 0;
                     let outcome = null;
                     if (playerOne.choice === playerTwo.choice) {
-                        if (currentTournaments[index].rules === "Guesser determines the wager amount") {
+                        if (liveTournaments[index].rules === "Guesser determines the wager amount") {
                             playerOne.score += Number(playerOne.bet);
                             playerTwo.score -= Number(playerOne.bet);
                         }
-                        else if (currentTournaments[index].rules === "Wager amount = average bet of both players") {
+                        else if (liveTournaments[index].rules === "Wager amount = average bet of both players") {
                             let avgBet = Math.floor((Number(playerOne.bet) + Number(playerTwo.bet)) / 2);
                             playerOne.score += avgBet;
                             playerTwo.score -= avgBet;
@@ -302,11 +276,11 @@ const addBet = async (data) => {
                         outcome = "guessed correctly";
                     }
                     else {
-                        if (currentTournaments[index].rules === "Guesser determines the wager amount") {
+                        if (liveTournaments[index].rules === "Guesser determines the wager amount") {
                             playerOne.score -= Number(playerOne.bet);
                             playerTwo.score += Number(playerOne.bet);
                         }
-                        else if (currentTournaments[index].rules === "Wager amount = average bet of both players") {
+                        else if (liveTournaments[index].rules === "Wager amount = average bet of both players") {
                             let avgBet = Math.floor((Number(playerOne.bet) + Number(playerTwo.bet)) / 2);
                             playerOne.score -= avgBet;
                             playerTwo.score += avgBet;
@@ -350,13 +324,13 @@ const addBet = async (data) => {
                     playerTwo.logs = playerOne.logs;
 
                     // updating player
-                    currentTournaments[index].currentPlayers[playerIdx] = playerOne;
-                    currentTournaments[index].currentPlayers[matchWithPlayerIdx] = playerTwo;
+                    liveTournaments[index].currentPlayers[playerIdx] = playerOne;
+                    liveTournaments[index].currentPlayers[matchWithPlayerIdx] = playerTwo;
 
                     // sending messages to all sockets
-                    messageToAllSockets(data.tournamentId, "winRound", { roundWinner: roundWinner, wonAmount: wonAmount , tournamentId: currentTournaments[index].id });
+                    messageToAllSockets(data.tournamentId, "winRound", { roundWinner: roundWinner, wonAmount: wonAmount, tournamentId: liveTournaments[index].id });
                     // updating player records
-                    messageToAllSockets(data.tournamentId, "update", { tournament: currentTournaments[index] });
+                    messageToAllSockets(data.tournamentId, "update", { tournament: liveTournaments[index] });
 
                     if (playerOne.score > 0 && playerTwo.score > 0) {
                         // Changing Roles
@@ -390,10 +364,10 @@ const addBet = async (data) => {
                         playerTwo.betTimeSeconds = 0;
 
                         // updating player
-                        currentTournaments[index].currentPlayers[playerIdx] = playerOne;
-                        currentTournaments[index].currentPlayers[matchWithPlayerIdx] = playerTwo;
+                        liveTournaments[index].currentPlayers[playerIdx] = playerOne;
+                        liveTournaments[index].currentPlayers[matchWithPlayerIdx] = playerTwo;
 
-                        messageToAllSockets(data.tournamentId, "update", { tournament: currentTournaments[index] });
+                        messageToAllSockets(data.tournamentId, "update", { tournament: liveTournaments[index] });
                     }
                     else {
                         // admin check the status of the tournament
@@ -408,92 +382,107 @@ const addBet = async (data) => {
                     playerTwo.betTimeSeconds = 0;
 
                     // updating player
-                    currentTournaments[index].currentPlayers[playerIdx] = playerOne;
-                    currentTournaments[index].currentPlayers[matchWithPlayerIdx] = playerTwo;
+                    liveTournaments[index].currentPlayers[playerIdx] = playerOne;
+                    liveTournaments[index].currentPlayers[matchWithPlayerIdx] = playerTwo;
 
-                    messageToAllSockets(data.tournamentId, "update", { tournament: currentTournaments[index] });
+                    messageToAllSockets(data.tournamentId, "update", { tournament: liveTournaments[index] });
                 }
             }
         }
+        else {
+            return { status: false, message: "Player not found" };
+        }
+    }
+    else {
+        return { status: false, message: "Tournament not found" };
     }
 }
 
 const addMessage = async (data) => {
-    let index = currentTournaments.findIndex(t => t.id === data.tournamentId);
+    let index = liveTournaments.findIndex(t => t.id === data.tournamentId);
     if (index !== -1) {
-        let playerIdx = currentTournaments[index].currentPlayers.findIndex(p => p.userId === data.userId);
+        let playerIdx = liveTournaments[index].currentPlayers.findIndex(p => p.userId === data.userId);
         if (playerIdx !== -1) {
-            var playerOne = currentTournaments[index].currentPlayers[playerIdx];
-            let matchWithPlayerIdx = currentTournaments[index].currentPlayers.findIndex(p => p.userId === playerOne.matchWith);
+            var playerOne = liveTournaments[index].currentPlayers[playerIdx];
+            let matchWithPlayerIdx = liveTournaments[index].currentPlayers.findIndex(p => p.userId === playerOne.matchWith);
             if (matchWithPlayerIdx !== -1) {
-                var playerTwo = currentTournaments[index].currentPlayers[matchWithPlayerIdx];
+                var playerTwo = liveTournaments[index].currentPlayers[matchWithPlayerIdx];
 
                 playerOne.logs = playerOne.logs.concat([{ message: data.message, by: playerOne.username, type: 'message' }]);
                 playerTwo.logs = playerOne.logs;
 
                 // updating player
-                currentTournaments[index].currentPlayers[playerIdx] = playerOne;
-                currentTournaments[index].currentPlayers[matchWithPlayerIdx] = playerTwo;
+                liveTournaments[index].currentPlayers[playerIdx] = playerOne;
+                liveTournaments[index].currentPlayers[matchWithPlayerIdx] = playerTwo;
 
                 // updating player records
-                messageToAllSockets(data.tournamentId, "message", { by: playerOne.username, to: playerTwo.username, message: data.message, tournamentId: currentTournaments[index].id });
-                messageToAllSockets(data.tournamentId, "update", { tournament: currentTournaments[index] });
+                messageToAllSockets(data.tournamentId, "message", { by: playerOne.username, to: playerTwo.username, message: data.message, tournamentId: liveTournaments[index].id });
+                messageToAllSockets(data.tournamentId, "update", { tournament: liveTournaments[index] });
+            }
+            else {
+                return { status: false, message: "Player not found" };
             }
         }
+        else {
+            return { status: false, message: "Player not found" };
+        }
+    }
+    else {
+        return { status: false, message: "Player not found" };
     }
 }
 
 const CheckTournamentStatus = (tournamentId) => {
     setTimeout(() => {
-        let index = currentTournaments.findIndex(tournament => tournament.id === tournamentId);
+        let index = liveTournaments.findIndex(tournament => tournament.id === tournamentId);
         if (index !== -1) {
-            if (currentTournaments[index].isStarted) {
-                currentTournaments[index].currentPlayers.forEach(async (player) => {
+            if (liveTournaments[index].isStarted) {
+                liveTournaments[index].currentPlayers.forEach(async (player) => {
                     if (!player.isPlaying) {
                         if ((player.totalRounds - player.winRounds) > 0) {
-                            let matchWithPlayerIdx = currentTournaments[index].currentPlayers.findIndex((p) => p.userId === player.matchWith);
+                            let matchWithPlayerIdx = liveTournaments[index].currentPlayers.findIndex((p) => p.userId === player.matchWith);
                             if (matchWithPlayerIdx !== -1) {
-                                currentTournaments[index].currentPlayers[matchWithPlayerIdx].matchWith = null;
+                                liveTournaments[index].currentPlayers[matchWithPlayerIdx].matchWith = null;
                             }
                             // remove player from current players
-                            currentTournaments[index].currentPlayers = currentTournaments[index].currentPlayers.filter((p) => p.userId !== player.userId);
-                            messageToAPlayer(tournamentId, player.userId, "endTournament", { tournamentId: currentTournaments[index].id });
+                            liveTournaments[index].currentPlayers = liveTournaments[index].currentPlayers.filter((p) => p.userId !== player.userId);
+                            messageToAPlayer(tournamentId, player.userId, "endTournament", { tournamentId: liveTournaments[index].id });
                         }
                     }
                 });
-                messageToAllSockets(tournamentId, "update", { tournament: currentTournaments[index] });
+                messageToAllSockets(tournamentId, "update", { tournament: liveTournaments[index] });
                 setTimeout(async () => {
-                    if (currentTournaments[index]) {
-                        let length = currentTournaments[index].currentPlayers.length;
+                    if (liveTournaments[index]) {
+                        let length = liveTournaments[index].currentPlayers.length;
                         if (length === 0) {
-                            currentTournaments[index].isStarted = false;
+                            liveTournaments[index].isStarted = false;
                         }
                         if (length === 1) {
                             let intervalIndex = intervalsArr.findIndex(interval => interval.tournamentId === tournamentId);
                             if (intervalIndex > -1) {
                                 clearInterval(intervalsArr[intervalIndex].interval);
                             }
-                            currentTournaments[index].isStarted = false;
-                            await setTournamentCompleted(tournamentId, currentTournaments[index].currentPlayers[0].userId);
-                            messageToAPlayer(tournamentId, currentTournaments[index].currentPlayers[0].userId, "endTournament", { tournamentId: currentTournaments[index].id });
-                            currentTournaments = currentTournaments.filter(t => t.id !== tournamentId);
+                            liveTournaments[index].isStarted = false;
+                            await setTournamentCompleted(tournamentId, liveTournaments[index].currentPlayers[0].userId);
+                            messageToAPlayer(tournamentId, liveTournaments[index].currentPlayers[0].userId, "endTournament", { tournamentId: liveTournaments[index].id });
+                            liveTournaments = liveTournaments.filter(t => t.id !== tournamentId);
                         }
                         if (length === 2 || length === 4 || length === 8 || length === 16 || length === 32 || length === 64 || length === 128 || length === 256 || length === 512) {
                             await CreateTorunamentRound(tournamentId);
                         }
                     }
-                }, currentTournaments[index].timeBetweenRounds * 1000);
+                }, liveTournaments[index].timeBetweenRounds * 1000);
             }
         }
     }, 10000);
 }
 
 const removeSocket = (socketId) => {
-    // remove the player from the currentTournaments
-    for (let i = 0; i < currentTournaments.length; i++) {
-        for (let j = 0; j < currentTournaments[i].activeSockets.length; j++) {
-            if (currentTournaments[i].activeSockets[j].socketId === socketId) {
-                currentTournaments[i].activeSockets.splice(j, 1);
+    // remove the player from the liveTournaments
+    for (let i = 0; i < liveTournaments.length; i++) {
+        for (let j = 0; j < liveTournaments[i].activeSockets.length; j++) {
+            if (liveTournaments[i].activeSockets[j].socketId === socketId) {
+                liveTournaments[i].activeSockets.splice(j, 1);
                 break;
             }
         }
@@ -507,9 +496,9 @@ const removeSocket = (socketId) => {
 
 // used for sending message to all sockets in tournament
 const messageToAllSockets = (tournamentId, name, data) => {
-    let index = currentTournaments.findIndex(t => t.id === tournamentId);
+    let index = liveTournaments.findIndex(t => t.id === tournamentId);
     if (index !== -1) {
-        currentTournaments[index].currentPlayers.forEach((p) => {
+        liveTournaments[index].currentPlayers.forEach((p) => {
             activeSockets.forEach(as => {
                 if (p.userId === as.userId) {
                     io.sockets.to(as.socketId).emit(name, data);
@@ -521,9 +510,9 @@ const messageToAllSockets = (tournamentId, name, data) => {
 
 // used for sending message to all players
 const messageToAllPlayers = (tournamentId, name, data) => {
-    let index = currentTournaments.findIndex(t => t.id === tournamentId);
+    let index = liveTournaments.findIndex(t => t.id === tournamentId);
     if (index !== -1) {
-        currentTournaments[index].currentPlayers.forEach((p) => {
+        liveTournaments[index].currentPlayers.forEach((p) => {
             var isSent = false;
             activeSockets.forEach(as => {
                 if (isSent === false) {
@@ -541,9 +530,9 @@ const messageToAllPlayers = (tournamentId, name, data) => {
 
 // used for sending message to player and opponent
 const messageToAPlayer = (tournamentId, userId, name, data) => {
-    let index = currentTournaments.findIndex(t => t.id === tournamentId);
+    let index = liveTournaments.findIndex(t => t.id === tournamentId);
     if (index !== -1) {
-        currentTournaments[index].currentPlayers.forEach((player) => {
+        liveTournaments[index].currentPlayers.forEach((player) => {
             activeSockets.forEach(activeSocket => {
                 if (player.userId === activeSocket.userId) {
                     if (player.userId === userId) {
@@ -592,11 +581,11 @@ const removeUpcomingTournament = (id) => {
     }
 }
 
-const removeCurrentTournament = (id) => {
-    let index = currentTournaments.findIndex(tournament => tournament.id === id);
+const removeLiveTournament = (id) => {
+    let index = liveTournaments.findIndex(tournament => tournament.id === id);
     if (index !== -1) {
         messageToAllSockets(id, "deletedTournament", { tournamentId: id });
-        currentTournaments.splice(index, 1);
+        liveTournaments.splice(index, 1);
     }
 }
 // end of admin functions
@@ -609,14 +598,15 @@ const addSocket = (socketId, user) => {
         }
     }
 };
+
 const removeSocketsWithUserId = (userId) => {
     // remove all sockets that have the userId
     activeSockets = activeSockets.filter(activeSocket => activeSocket.userId !== userId);
-    // remove the player from the currentTournaments
-    for (let i = 0; i < currentTournaments.length; i++) {
-        for (let j = 0; j < currentTournaments[i].activeSockets.length; j++) {
-            if (currentTournaments[i].activeSockets[j].userId === userId) {
-                currentTournaments[i].activeSockets.splice(j, 1);
+    // remove the player from the liveTournaments
+    for (let i = 0; i < liveTournaments.length; i++) {
+        for (let j = 0; j < liveTournaments[i].activeSockets.length; j++) {
+            if (liveTournaments[i].activeSockets[j].userId === userId) {
+                liveTournaments[i].activeSockets.splice(j, 1);
             }
         }
     }
@@ -626,9 +616,12 @@ const removeSocketsWithUserId = (userId) => {
 module.exports = {
     initServer,
     addSocket,
+    addBet,
+    addMessage,
+    getLiveTournament,
     removeSocketsWithUserId,
     addUpcomingTournament,
     updateUpcomingTournament,
     removeUpcomingTournament,
-    removeCurrentTournament
+    removeLiveTournament
 }

@@ -121,6 +121,22 @@ export default function My({ socketId, username, isAdmin, changeUrl }) {
                                                     className="my-auto px-2 py-1 font-semibold leading-tight rounded bg-yellow-700 text-yellow-100">
                                                     View
                                                 </button>
+                                                {
+                                                    new Date(tournament.startDateTime) > new Date() && (
+                                                        <button onClick={(e) => changeUrl('/player/tournaments/leave?id=' + tournament.id)}
+                                                            className="my-auto px-2 py-1 font-semibold leading-tight rounded bg-red-700 text-red-100">
+                                                            Leave
+                                                        </button>
+                                                    )
+                                                }
+                                                {
+                                                    new Date(tournament.startDateTime) < new Date() && (
+                                                        <button onClick={(e) => changeUrl('/games/magicmarble?id=' + tournament.id)}
+                                                            className="my-auto px-2 py-1 font-semibold leading-tight rounded bg-green-700 text-green-100">
+                                                            Play
+                                                        </button>
+                                                    )
+                                                }
                                             </div>
                                         </td>
                                         <td className="px-4 py-3 text-sm">
